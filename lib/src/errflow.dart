@@ -2,6 +2,7 @@ import 'info.dart';
 
 class ErrFlow<T> {
   ErrFlow(this.defaultError) {
+    _lastError = defaultError;
     _info.addListener(
       ({T type, dynamic exception, StackTrace stack, dynamic context}) {
         if (type != null) {
