@@ -1,11 +1,11 @@
 import 'info.dart';
 
 class ErrFlow<T> {
-  ErrFlow(this.defaultErrorType) {
+  ErrFlow(this.defaultError) {
     _info.addListener(
       ({T type, dynamic exception, StackTrace stack, dynamic context}) {
         if (type != null) {
-          _lastType = type;
+          _lastError = type;
         }
         if (logger != null && exception != null) {
           logger(exception, stack, context: context);
@@ -15,12 +15,12 @@ class ErrFlow<T> {
   }
 
   final ErrInfo<T> _info = ErrInfo<T>();
-  T defaultErrorType;
-  T _lastType;
+  T defaultError;
+  T _lastError;
   void Function(dynamic, StackTrace, {dynamic context}) logger;
 
   ErrInfo<T> get info => _info;
-  T get lastError => _lastType;
+  T get lastError => _lastError;
 
   void dispose() {
     _info.dispose();
@@ -48,14 +48,14 @@ class ErrFlow<T> {
     assert(errorIf == null || onError != null);
     assert(criticalIf == null || onCriticalError != null);
 
-    _lastType = defaultErrorType;
+    _lastError = defaultError;
     final T2 result = await f();
 
     // NOTE: criticalIf should be evaluated before errorIf as it matters more.
-    if (criticalIf != null && criticalIf(result, _lastType)) {
-      onCriticalError(result, _lastType);
-    } else if (errorIf != null && errorIf(result, _lastType)) {
-      onError(result, _lastType);
+    if (criticalIf != null && criticalIf(result, _lastError)) {
+      onCriticalError(result, _lastError);
+    } else if (errorIf != null && errorIf(result, _lastError)) {
+      onError(result, _lastError);
     }
 
     return result;
