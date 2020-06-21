@@ -19,6 +19,8 @@ class ErrFlow<T> {
   T defaultError;
   T _lastError;
   void Function(dynamic, StackTrace, {dynamic context}) logger;
+  void Function<T2>(T2, T) errorHandler;
+  void Function<T2>(T2, T) criticalErrorHandler;
 
   ErrInfo<T> get info => _info;
   T get lastError => _lastError;
@@ -47,17 +49,22 @@ class ErrFlow<T> {
     void Function(T2, T) onCriticalError,
   }) async {
     assert(f != null);
-    assert(errorIf == null || onError != null);
-    assert(criticalIf == null || onCriticalError != null);
+    assert(errorIf == null || (onError != null || errorHandler != null));
+    assert(criticalIf == null ||
+        (onCriticalError != null || criticalErrorHandler != null));
 
     _lastError = defaultError;
     final T2 result = await f();
 
-    // NOTE: criticalIf should be evaluated before errorIf as it matters more.
+    // NOTE: criticalIf must be evaluated ahead of errorIf as it matters more.
     if (criticalIf != null && criticalIf(result, _lastError)) {
-      onCriticalError(result, _lastError);
+      onCriticalError == null
+          ? criticalErrorHandler(result, _lastError)
+          : onCriticalError(result, _lastError);
     } else if (errorIf != null && errorIf(result, _lastError)) {
-      onError(result, _lastError);
+      onError == null
+          ? errorHandler(result, _lastError)
+          : onError(result, _lastError);
     }
 
     return result;
