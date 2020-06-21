@@ -46,6 +46,7 @@ class ErrFlow<T> {
     void Function(T2, T) onError,
     void Function(T2, T) onCriticalError,
   }) async {
+    assert(f != null);
     assert(errorIf == null || onError != null);
     assert(criticalIf == null || onCriticalError != null);
 
