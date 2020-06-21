@@ -17,7 +17,7 @@ void main() {
   });
 
   group('function passed to scope()', () {
-    test('assertion error if the function is null', () {
+    test('assert() fails if the function is null', () {
       expect(errFlow.scope<void>(null), throwsA(isA<AssertionError>()));
     });
 
@@ -39,36 +39,44 @@ void main() {
   });
 
   group('errorIf / onError', () {
-    test('assertion error if onError is missing', () async {
+    test('assert() fails) if both onError and eventHandler are missing', () {
       expect(
         () => errFlow.scope<void>(
           () => null,
-          errorIf: (_, __) => null,
+          errorIf: (_, __) => true,
         ),
         throwsA(isA<AssertionError>()),
       );
     });
 
-    test('onError is called only when errorIf is true', () async {
-      int v = 0;
+    test('onError is called even without set() if errorIf is true', () async {
+      bool r = false;
 
       await errFlow.scope<String>(
         () => null,
-        errorIf: (String result, int value) => false,
-        onError: (String result, int value) => v = 1,
+        errorIf: (_, __) => true,
+        onError: (_, __) => r = true,
       );
-      expect(v, 0);
 
-      await errFlow.scope<String>(
+      expect(r, isTrue);
+    });
+
+    test('onError is called only when errorIf is true', () {
+      errFlow.scope<String>(
         () => null,
-        errorIf: (String result, int value) => true,
-        onError: (String result, int value) => v = 2,
+        errorIf: (_, __) => false,
+        onError: (_, __) => expect(false, isTrue),
       );
-      expect(v, 2);
+
+      errFlow.scope<String>(
+        () => null,
+        errorIf: (_, __) => true,
+        onError: (_, __) => expect(true, isTrue),
+      );
     });
 
     test('errorIf and onError get correct values', () async {
-      errFlow.scope<String>(
+      await errFlow.scope<String>(
         () => Future<String>.delayed(Duration.zero, () {
           errFlow.info.set(200);
           return 'foo';
@@ -87,32 +95,46 @@ void main() {
   });
 
   group('criticalIf / onCriticalError', () {
-    test('assertion error if onCriticalError is missing', () async {
-      expect(
-        () => errFlow.scope<void>(
+    test(
+      'assert() fails if onCriticalError and criticalErrorHandler are missing',
+      () {
+        expect(
+          () => errFlow.scope<void>(
+            () => null,
+            criticalIf: (_, __) => true,
+          ),
+          throwsA(isA<AssertionError>()),
+        );
+      },
+    );
+
+    test(
+      'onCriticalError is called even without set() if criticalErrorIf is true',
+      () async {
+        bool r = false;
+
+        await errFlow.scope<String>(
           () => null,
-          criticalIf: (_, __) => null,
-        ),
-        throwsA(isA<AssertionError>()),
-      );
-    });
+          criticalIf: (_, __) => true,
+          onCriticalError: (_, __) => r = true,
+        );
 
-    test('onCriticalError is called only when criticalIf is true', () async {
-      int v = 0;
+        expect(r, isTrue);
+      },
+    );
 
-      await errFlow.scope<String>(
+    test('onCriticalError is called only when criticalIf is true', () {
+      errFlow.scope<String>(
         () => null,
-        criticalIf: (String result, int value) => false,
-        onCriticalError: (String result, int value) => v = 1,
+        criticalIf: (_, __) => false,
+        onCriticalError: (_, __) => expect(false, isTrue),
       );
-      expect(v, 0);
 
-      await errFlow.scope<String>(
+      errFlow.scope<String>(
         () => null,
-        criticalIf: (String result, int value) => true,
-        onCriticalError: (String result, int value) => v = 2,
+        criticalIf: (_, __) => true,
+        onCriticalError: (_, __) => expect(true, isTrue),
       );
-      expect(v, 2);
     });
 
     test('criticalIf and onCriticalError get correct values', () async {
@@ -134,6 +156,86 @@ void main() {
     });
   });
 
+  group('criticalIf / onCriticalError', () {
+    test('onError is ignored if onCriticalError is set', () {
+      errFlow.scope<bool>(
+        () => null,
+        errorIf: (_, __) => true,
+        criticalIf: (_, __) => true,
+        onError: (_, __) => expect(false, isTrue),
+        onCriticalError: (_, __) => expect(true, isTrue),
+      );
+    });
+  });
+
+  group('default handlers', () {
+    test('errorHandler is used if set', () async {
+      final ErrFlow<int> errFlow = ErrFlow<int>(0);
+      bool r = false;
+
+      errFlow.errorHandler = <bool>(bool result, _) {
+        r = result == true; // Writing `r = result;` shows a strange error...
+      };
+
+      await errFlow.scope<bool>(
+        () => Future<bool>.value(true),
+        errorIf: (bool result, _) => result,
+      );
+
+      expect(r, isTrue);
+    });
+
+    test('errorHandler is ignored if onError is set', () async {
+      final ErrFlow<int> errFlow = ErrFlow<int>(0);
+      bool r1 = false;
+      bool r2 = false;
+
+      errFlow.errorHandler = <bool>(_, __) => r1 = true;
+
+      await errFlow.scope<bool>(
+        () => null,
+        errorIf: (_, __) => true,
+        onError: (_, __) => r2 = true,
+      );
+
+      expect(r1, isFalse);
+      expect(r2, isTrue);
+    });
+
+    test('criticalErrorHandler is used if set', () async {
+      final ErrFlow<int> errFlow = ErrFlow<int>(0);
+      bool r = false;
+
+      errFlow.criticalErrorHandler = <bool>(bool result, _) {
+        r = result == true; // Writing `r = result;` shows a strange error...
+      };
+
+      await errFlow.scope<bool>(
+        () => Future<bool>.value(true),
+        criticalIf: (bool result, _) => result,
+      );
+
+      expect(r, isTrue);
+    });
+
+    test('criticalErrorHandler is ignored if onCriticalError is set', () async {
+      final ErrFlow<int> errFlow = ErrFlow<int>(0);
+      bool r1 = false;
+      bool r2 = false;
+
+      errFlow.errorHandler = <bool>(_, __) => r1 = true;
+
+      await errFlow.scope<bool>(
+        () => null,
+        criticalIf: (_, __) => true,
+        onCriticalError: (_, __) => r2 = true,
+      );
+
+      expect(r1, isFalse);
+      expect(r2, isTrue);
+    });
+  });
+
   group('logger', () {
     test('logger is called with correct values', () {
       final _Log log = _Log();
@@ -152,7 +254,7 @@ void main() {
       errFlow.info.log('foo', _StackTrace('bar'));
       expect(log.exception, 'foo');
       expect(log.stack.toString(), 'bar');
-      expect(log.context, null);
+      expect(log.context, isNull);
     });
 
     test('calling set() calls the logger', () {
@@ -170,9 +272,9 @@ void main() {
       errFlow.logger = log.logger;
 
       errFlow.info.set(null, null, _StackTrace('bar'), 'baz');
-      expect(log.exception, null);
-      expect(log.stack, null);
-      expect(log.context, null);
+      expect(log.exception, isNull);
+      expect(log.stack, isNull);
+      expect(log.context, isNull);
     });
   });
 }

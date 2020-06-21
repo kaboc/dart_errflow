@@ -41,7 +41,7 @@ class _Notification {
     int type,
     dynamic exception,
     StackTrace stack,
-    dynamic context
+    dynamic context,
   }) {
     list.add(type);
   }

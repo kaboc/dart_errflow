@@ -6,20 +6,28 @@ export 'package:errflow/errflow.dart';
 export 'enum.dart';
 
 class ErrorHelper {
-  final errFlow = ErrFlow<ErrorTypes>(ErrorTypes.none)
-    ..logger = (dynamic e, _, {dynamic context}) {
-      print('Logged: $e${context == null ? '' : ' ($context)'}');
-    };
+  ErrorHelper() {
+    errFlow = ErrFlow<ErrorTypes>(ErrorTypes.none)
+      ..logger = _logger
+      ..errorHandler = _errorHandler
+      ..criticalErrorHandler = _criticalErrorHandler;
+  }
+
+  ErrFlow<ErrorTypes> errFlow;
 
   void dispose() {
     errFlow.dispose();
   }
 
-  void onError(dynamic result, ErrorTypes errorType) {
+  void _logger(dynamic e, StackTrace _, {dynamic context}) {
+    print('Logged: $e${context == null ? '' : ' ($context)'}');
+  }
+
+  void _errorHandler<T>(T result, ErrorTypes errorType) {
     print('Error: $errorType');
   }
 
-  void onCriticalError(dynamic result, ErrorTypes errorType) {
+  void _criticalErrorHandler<T>(T result, ErrorTypes errorType) {
     print('Critical error: $errorType');
   }
 }

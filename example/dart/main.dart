@@ -47,13 +47,11 @@ class _App {
       () => _model.someProcess(),
 
       // You don't necessarily have to specify both errorIf and criticalIf.
-      // Omit errorIf and onError if you want to ignore non-critical errors,
-      // or omit criticalIf and onCriticalError if you are sure the errors
-      // that may occur in the process will never be critical.
+      // Omit errorIf if you want to ignore non-critical errors, or omit
+      // criticalIf if you are sure the errors that may occur in the process
+      // will never be critical.
       errorIf: (result, type) => !result && type == ErrorTypes.minor,
       criticalIf: (result, type) => !result && type != ErrorTypes.minor,
-      onError: errorHelper.onError,
-      onCriticalError: errorHelper.onCriticalError,
     );
   }
 
