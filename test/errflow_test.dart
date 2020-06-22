@@ -18,7 +18,7 @@ void main() {
 
   group('function passed to scope()', () {
     test('assert() fails if the function is null', () {
-      expect(errFlow.scope<void>(null), throwsA(isA<AssertionError>()));
+      expect(() => errFlow.scope<void>(null), throwsA(isA<AssertionError>()));
     });
 
     test('error is reset to default when the function is called', () {
