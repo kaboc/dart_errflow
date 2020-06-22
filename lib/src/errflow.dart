@@ -5,6 +5,9 @@ class ErrFlow<T> {
     _lastError = defaultError;
     _info.addListener(
       ({T type, dynamic exception, StackTrace stack, dynamic context}) {
+        assert((exception != null && logger != null) ||
+            (stack == null && context == null));
+
         if (type != null) {
           _lastError = type;
         }

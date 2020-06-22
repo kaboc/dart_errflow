@@ -267,15 +267,24 @@ void main() {
       expect(log.context, 'baz');
     });
 
-    test('calling set() does not call the logger if exception is null', () {
-      final _Log log = _Log();
-      errFlow.logger = log.logger;
-
-      errFlow.info.set(null, null, _StackTrace('bar'), 'baz');
-      expect(log.exception, isNull);
-      expect(log.stack, isNull);
-      expect(log.context, isNull);
+    test('assert() fails if no logger is set but exception is provided', () {
+      expect(
+        () => errFlow.info.log(null, _StackTrace('bar')),
+        throwsA(isA<AssertionError>()),
+      );
     });
+
+    test(
+      'assert() fails if log() is called with stack/context but without exception',
+      () {
+        errFlow.useDefaultLogger();
+
+        expect(
+          () => errFlow.info.log(null, _StackTrace('bar'), 'baz'),
+          throwsA(isA<AssertionError>()),
+        );
+      },
+    );
   });
 }
 
