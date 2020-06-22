@@ -11,7 +11,7 @@ class Model {
   final ErrInfo<ErrorTypes> errInfo;
 
   /// A process that calls an error-prone process, handles the exception
-  /// raised there, and notifies the corresponding error.
+  /// raised there, and sets the corresponding error.
   Future<bool> someProcess() async {
     try {
       return await errorProneProcess();

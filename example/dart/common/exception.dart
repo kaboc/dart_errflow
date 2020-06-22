@@ -4,5 +4,7 @@ class BaseException implements Exception {
 }
 
 class ExceptionA extends BaseException {}
+
 class ExceptionB extends BaseException {}
+
 class ExceptionC extends BaseException {}

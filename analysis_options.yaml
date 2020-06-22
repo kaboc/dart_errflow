@@ -7,6 +7,8 @@ analyzer:
     missing_return: error
     todo: ignore
     sdk_version_async_exported_from_core: ignore
+  exclude:
+    - "example/**"
 
 linter:
   rules:
