@@ -39,7 +39,7 @@ void main() {
   });
 
   group('errorIf / onError', () {
-    test('assert() fails) if both onError and eventHandler are missing', () {
+    test('assert() fails if both onError and eventHandler are missing', () {
       expect(
         () => errFlow.scope<void>(
           () => null,
