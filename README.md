@@ -1,13 +1,14 @@
 # errflow
 
-![Dart CI](https://github.com/kaboc/dart_errflow/workflows/Dart%20CI/badge.svg)
+[![Pub Version](https://img.shields.io/pub/v/errflow)](https://pub.dev/packages/errflow)
+[![Dart CI](https://github.com/kaboc/dart_errflow/workflows/Dart%20CI/badge.svg)](https://github.com/kaboc/dart_errflow/actions)
 
 A tiny Dart/Flutter package for making it somewhat easier to comprehend the flow of errors
 and handle them.
 
 ## Usage
 
-**Initialisation and clean-up**
+### Initialisation and clean-up
 
 Instantiate `ErrFlow`, with the default error type representing that there is no error.
 
@@ -29,7 +30,7 @@ final errFlow = ErrFlow<ErrorTypes>(ErrorTypes.none);
 errFlow.dispose();
 ```
 
-**Setting/logging an error**
+### Setting/logging an error
 
 Use `set()` to set an error type equivalent to an actual exception/error occurring when some
 process of yours has failed, such as when an exception/error has occurred. The listener is
@@ -54,7 +55,7 @@ Future<bool> yourMethod() {
 }
 ```
 
-**Handling errors**
+### Handling errors
 
 `scope()` executes a function and handles errors occurring in the function, according to
 specified conditions. Use both or either of `errorIf` and `criticalIf` to set the conditions
@@ -79,7 +80,7 @@ final result = await errFlow.scope<bool>(
 );
 ```
 
-**Default error handlers**
+### Default error handlers
 
 You may want to consistently use a specific handler for non-critical errors, and the same or
 another one for critical errors. In such a case, `errorHandler` and `criticalErrorHandler` will
@@ -107,7 +108,7 @@ final result = await errFlow.scope<bool>(
 );
 ```
 
-**Adding/removing a listener**
+### Adding/removing a listener
 
 This is usually unnecessary, but you can add a custom listener for your own needs.
 

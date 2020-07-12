@@ -1,4 +1,4 @@
-// Run this file with assertion enable by `dart --enable-asserts main.dart`
+// Run this file with assertion enabled by `dart --enable-asserts main.dart`
 
 import 'package:errflow/errflow.dart';
 
