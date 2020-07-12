@@ -11,7 +11,7 @@ void main() {
     });
 
     test('lastError is updated when set() is called', () {
-      errFlow.info.set(200);
+      errFlow.set(200);
       expect(errFlow.lastError, 200);
     });
   });
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('error is reset to default when the function is called', () {
-      errFlow.info.set(200);
+      errFlow.set(200);
 
       errFlow.scope<void>(() {
         expect(errFlow.lastError, 100);
@@ -78,7 +78,7 @@ void main() {
     test('errorIf and onError get correct values', () async {
       await errFlow.scope<String>(
         () => Future<String>.delayed(Duration.zero, () {
-          errFlow.info.set(200);
+          errFlow.set(200);
           return 'foo';
         }),
         errorIf: (String result, int value) {
@@ -140,7 +140,7 @@ void main() {
     test('criticalIf and onCriticalError get correct values', () async {
       errFlow.scope<String>(
         () => Future<String>.delayed(Duration.zero, () {
-          errFlow.info.set(200);
+          errFlow.set(200);
           return 'foo';
         }),
         criticalIf: (String result, int value) {
@@ -241,7 +241,7 @@ void main() {
       final _Log log = _Log();
       errFlow.logger = log.logger;
 
-      errFlow.info.log('foo', _StackTrace('bar'), 'baz');
+      errFlow.log('foo', _StackTrace('bar'), 'baz');
       expect(log.exception, 'foo');
       expect(log.stack.toString(), 'bar');
       expect(log.context, 'baz');
@@ -251,7 +251,7 @@ void main() {
       final _Log log = _Log();
       errFlow.logger = log.logger;
 
-      errFlow.info.log('foo', _StackTrace('bar'));
+      errFlow.log('foo', _StackTrace('bar'));
       expect(log.exception, 'foo');
       expect(log.stack.toString(), 'bar');
       expect(log.context, isNull);
@@ -261,7 +261,7 @@ void main() {
       final _Log log = _Log();
       errFlow.logger = log.logger;
 
-      errFlow.info.set(null, 'foo', _StackTrace('bar'), 'baz');
+      errFlow.set(null, 'foo', _StackTrace('bar'), 'baz');
       expect(log.exception, 'foo');
       expect(log.stack.toString(), 'bar');
       expect(log.context, 'baz');
@@ -269,7 +269,7 @@ void main() {
 
     test('assert() fails if no logger is set but exception is provided', () {
       expect(
-        () => errFlow.info.log(null, _StackTrace('bar')),
+        () => errFlow.log(null, _StackTrace('bar')),
         throwsA(isA<AssertionError>()),
       );
     });
@@ -280,7 +280,7 @@ void main() {
         errFlow.useDefaultLogger();
 
         expect(
-          () => errFlow.info.log(null, _StackTrace('bar'), 'baz'),
+          () => errFlow.log(null, _StackTrace('bar'), 'baz'),
           throwsA(isA<AssertionError>()),
         );
       },

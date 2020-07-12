@@ -1,9 +1,10 @@
 import 'info.dart';
 
-class ErrFlow<T> {
+class ErrFlow<T> with ErrInfo<T> {
   ErrFlow(this.defaultError) {
     _lastError = defaultError;
-    _info.addListener(
+
+    addListener(
       ({T type, dynamic exception, StackTrace stack, dynamic context}) {
         assert((exception != null && logger != null) ||
             (stack == null && context == null));
@@ -18,19 +19,14 @@ class ErrFlow<T> {
     );
   }
 
-  final ErrInfo<T> _info = ErrInfo<T>();
   T defaultError;
   T _lastError;
   void Function(dynamic, StackTrace, {dynamic context}) logger;
   void Function<T2>(T2, T) errorHandler;
   void Function<T2>(T2, T) criticalErrorHandler;
 
-  ErrInfo<T> get info => _info;
   T get lastError => _lastError;
 
-  void dispose() {
-    _info.dispose();
-  }
 
   void useDefaultLogger() {
     logger = (dynamic exception, StackTrace stack, {dynamic context}) {
