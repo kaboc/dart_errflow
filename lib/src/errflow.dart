@@ -19,11 +19,11 @@ class ErrFlow<T> with ErrInfo<T> {
     );
   }
 
-  T defaultError;
+  final T defaultError;
   T _lastError;
   void Function(dynamic, StackTrace, {dynamic context}) logger;
-  void Function<T2>(T2, T) errorHandler;
-  void Function<T2>(T2, T) criticalErrorHandler;
+  void Function<S>(S, T) errorHandler;
+  void Function<S>(S, T) criticalErrorHandler;
 
   T get lastError => _lastError;
 
@@ -40,20 +40,20 @@ class ErrFlow<T> with ErrInfo<T> {
     };
   }
 
-  Future<T2> scope<T2>(
-    Future<T2> Function() f, {
-    bool Function(T2, T) errorIf,
-    bool Function(T2, T) criticalIf,
-    void Function(T2, T) onError,
-    void Function(T2, T) onCriticalError,
+  Future<S> scope<S>(
+    Future<S> Function() process, {
+    bool Function(S, T) errorIf,
+    bool Function(S, T) criticalIf,
+    void Function(S, T) onError,
+    void Function(S, T) onCriticalError,
   }) async {
-    assert(f != null);
+    assert(process != null);
     assert(errorIf == null || (onError != null || errorHandler != null));
     assert(criticalIf == null ||
         (onCriticalError != null || criticalErrorHandler != null));
 
     _lastError = defaultError;
-    final T2 result = await f();
+    final S result = await process();
 
     // NOTE: criticalIf must be evaluated ahead of errorIf as it matters more.
     if (criticalIf != null && criticalIf(result, _lastError)) {

@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 typedef _Listener<T> = void Function({
   T type,
   dynamic exception,
@@ -32,6 +34,7 @@ class ErrInfo<T> {
     _listeners.remove(listener);
   }
 
+  @mustCallSuper
   void dispose() {
     assert(_debugAssertNotDisposed());
     _listeners = null;
@@ -50,7 +53,7 @@ class ErrInfo<T> {
     }
   }
 
-  void log(dynamic exception, StackTrace stack, [dynamic context]) {
+  void log(dynamic exception, [StackTrace stack, dynamic context]) {
     assert(_debugAssertNotDisposed());
 
     for (final _Listener<T> listener in _listeners) {
