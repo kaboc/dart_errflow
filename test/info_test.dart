@@ -32,7 +32,7 @@ void main() {
       ..dispose();
 
     expect(notification.values, <int>[1]);
-    expect(() => info.set(2), throwsNoSuchMethodError);
+    expect(() => info.set(2), throwsA(isA<AssertionError>()));
   });
 }
 
