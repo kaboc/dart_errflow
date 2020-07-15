@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 import 'package:errflow/errflow.dart';
 
 void main() {
-  final ErrFlow<int> errFlow = ErrFlow<int>(100);
+  final errFlow = ErrFlow<int>(100);
 
   group('lastError', () {
     test('default error is set to lastError on initialisation', () {
@@ -31,7 +31,7 @@ void main() {
     });
 
     test('scope returns the value returned from the passed function', () async {
-      final int result = await errFlow.scope<int>(
+      final result = await errFlow.scope<int>(
         () => Future<int>.value(200),
       );
       expect(result, 200);
@@ -50,7 +50,7 @@ void main() {
     });
 
     test('onError is called even without set() if errorIf is true', () async {
-      bool r = false;
+      var r = false;
 
       await errFlow.scope<String>(
         () => null,
@@ -111,7 +111,7 @@ void main() {
     test(
       'onCriticalError is called even without set() if criticalErrorIf is true',
       () async {
-        bool r = false;
+        var r = false;
 
         await errFlow.scope<String>(
           () => null,
@@ -170,8 +170,8 @@ void main() {
 
   group('default handlers', () {
     test('errorHandler is used if set', () async {
-      final ErrFlow<int> errFlow = ErrFlow<int>(0);
-      bool r = false;
+      final errFlow = ErrFlow<int>(0);
+      var r = false;
 
       errFlow.errorHandler = <bool>(bool result, _) {
         r = result == true; // Writing `r = result;` shows a strange error...
@@ -186,9 +186,9 @@ void main() {
     });
 
     test('errorHandler is ignored if onError is set', () async {
-      final ErrFlow<int> errFlow = ErrFlow<int>(0);
-      bool r1 = false;
-      bool r2 = false;
+      final errFlow = ErrFlow<int>(0);
+      var r1 = false;
+      var r2 = false;
 
       errFlow.errorHandler = <bool>(_, __) => r1 = true;
 
@@ -203,8 +203,8 @@ void main() {
     });
 
     test('criticalErrorHandler is used if set', () async {
-      final ErrFlow<int> errFlow = ErrFlow<int>(0);
-      bool r = false;
+      final errFlow = ErrFlow<int>(0);
+      var r = false;
 
       errFlow.criticalErrorHandler = <bool>(bool result, _) {
         r = result == true; // Writing `r = result;` shows a strange error...
@@ -219,9 +219,9 @@ void main() {
     });
 
     test('criticalErrorHandler is ignored if onCriticalError is set', () async {
-      final ErrFlow<int> errFlow = ErrFlow<int>(0);
-      bool r1 = false;
-      bool r2 = false;
+      final errFlow = ErrFlow<int>(0);
+      var r1 = false;
+      var r2 = false;
 
       errFlow.errorHandler = <bool>(_, __) => r1 = true;
 
@@ -238,7 +238,7 @@ void main() {
 
   group('logger', () {
     test('logger is called with correct values', () {
-      final _Log log = _Log();
+      final log = _Log();
       errFlow.logger = log.logger;
 
       errFlow.log('foo', _StackTrace('bar'), 'baz');
@@ -248,7 +248,7 @@ void main() {
     });
 
     test('logger is called with correct values when context is omitted', () {
-      final _Log log = _Log();
+      final log = _Log();
       errFlow.logger = log.logger;
 
       errFlow.log('foo', _StackTrace('bar'));
@@ -258,7 +258,7 @@ void main() {
     });
 
     test('calling set() calls the logger', () {
-      final _Log log = _Log();
+      final log = _Log();
       errFlow.logger = log.logger;
 
       errFlow.set(null, 'foo', _StackTrace('bar'), 'baz');

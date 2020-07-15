@@ -67,7 +67,7 @@ class ErrInfo<T> {
   void set(T type, [dynamic exception, StackTrace stack, dynamic context]) {
     assert(_debugAssertNotDisposed());
 
-    for (final _Listener<T> listener in _listeners) {
+    for (final listener in _listeners) {
       listener(
         type: type,
         exception: exception,
@@ -87,7 +87,7 @@ class ErrInfo<T> {
   void log(dynamic exception, [StackTrace stack, dynamic context]) {
     assert(_debugAssertNotDisposed());
 
-    for (final _Listener<T> listener in _listeners) {
+    for (final listener in _listeners) {
       listener(exception: exception, stack: stack, context: context);
     }
   }

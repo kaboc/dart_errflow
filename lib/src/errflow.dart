@@ -108,7 +108,7 @@ class ErrFlow<T> with ErrInfo<T> {
         (onCriticalError != null || criticalErrorHandler != null));
 
     _lastError = defaultError;
-    final S result = await process();
+    final result = await process();
 
     // NOTE: criticalIf must be evaluated ahead of errorIf.
     if (criticalIf != null && criticalIf(result, _lastError)) {

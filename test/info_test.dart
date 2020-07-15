@@ -3,11 +3,11 @@ import 'package:test/test.dart';
 import 'package:errflow/errflow.dart';
 
 void main() {
-  final ErrInfo<int> info = ErrInfo<int>();
+  final info = ErrInfo<int>();
 
   test('only remaining listeners are notified', () {
-    final _Notification notification1 = _Notification();
-    final _Notification notification2 = _Notification();
+    final notification1 = _Notification();
+    final notification2 = _Notification();
 
     info
       ..addListener(notification1.listener)
@@ -24,7 +24,7 @@ void main() {
   });
 
   test('cannot be used after disposed', () {
-    final _Notification notification = _Notification();
+    final notification = _Notification();
 
     info
       ..addListener(notification.listener)

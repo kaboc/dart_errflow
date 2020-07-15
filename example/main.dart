@@ -14,7 +14,7 @@ Future<void> main() async {
     ..logger = logger
     ..criticalErrorHandler = errorHandler;
 
-  for (int i = -2; i <= 2; i++) {
+  for (var i = -2; i <= 2; i++) {
     final result = await errFlow.scope<int>(
       () async => dividedBy(10, i),
       criticalIf: (result, type) => type == ErrorTypes.critical,
