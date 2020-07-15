@@ -3,7 +3,7 @@
 [![Pub Version](https://img.shields.io/pub/v/errflow)](https://pub.dev/packages/errflow)
 [![Dart CI](https://github.com/kaboc/dart_errflow/workflows/Dart%20CI/badge.svg)](https://github.com/kaboc/dart_errflow/actions)
 
-A tiny Dart/Flutter package for making it somewhat easier to comprehend the flow of errors
+A Dart/Flutter package for making it somewhat easier to comprehend the flow of errors
 and handle them.
 
 ## Usage
@@ -12,7 +12,7 @@ and handle them.
 
 Instantiate `ErrFlow`, with the default error type representing that there is no error.
 
-Make sure to call `dispose()` when `ErrFlow` is no longer needed.
+Make sure to call `dispose()` when the object of `ErrFlow` is no longer needed.
 
 ```dart
 enum ErrorTypes {
@@ -45,6 +45,9 @@ Future<bool> yourMethod() {
   } catch(e, s) {
     // This updates the last error type and also triggers logging.
     errFlow.set(ErrorTypes.foo, e, s, 'additional info');
+
+    // Provide only the error type if logging is unnecessary.
+    errFlow.set(ErrorTypes.foo);
 
     // Use log() instead if you consider the exception as
     // non-problematic and want to just log it.
@@ -82,7 +85,7 @@ final result = await errFlow.scope<bool>(
 
 ### Default error handlers
 
-You may want to consistently use a specific handler for non-critical errors, and the same or
+You may want to consistently use a particular handler for non-critical errors, and the same or
 another one for critical errors. In such a case, `errorHandler` and `criticalErrorHandler` will
 come in handy. You can specify in advance how errors should be handled, and omit `onError` and
 `onCriticalError` in `scope()`.
