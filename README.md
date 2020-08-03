@@ -10,9 +10,9 @@ and handle them.
 
 ### Initialisation and clean-up
 
-Instantiate `ErrFlow`, with the default error type representing that there is no error.
+Instantiate [ErrFlow][errflow], with the default error type representing that there is no error.
 
-Make sure to call `dispose()` when the object of `ErrFlow` is no longer needed.
+Make sure to call [dispose()][dispose] when the object of [ErrFlow][errflow] is no longer needed.
 
 ```dart
 enum ErrorTypes {
@@ -32,11 +32,12 @@ errFlow.dispose();
 
 ### Setting/logging an error
 
-Use `set()` to set an error type equivalent to an actual exception/error occurring when some
-process of yours has failed, such as when an exception/error has occurred. The listener is
-notified of the error type you set and stores it as the last error type so that it can be
-checked later. The listener also logs the information on the exception/error if it is provided
-via `set()` or `log()`.
+Use [set()][set] to set a custom error type equivalent to the actual exception/error occurring
+when some process of yours has failed. The listener is notified of the error type and stores it
+as the last error type ([lastError][lasterror]) so that it can be checked later.
+
+The listener also calls the [logger][logger] to log a set of information about an exception/error
+if it is provided via [set()][set] or [log()][log].
 
 ```dart
 Future<bool> yourMethod() {
@@ -49,7 +50,7 @@ Future<bool> yourMethod() {
     // Provide only the error type if logging is unnecessary.
     errFlow.set(ErrorTypes.foo);
 
-    // Use log() instead if you consider the exception as
+    // Use log() instead, if you consider the exception as
     // non-problematic and want to just log it.
     errFlow.log(e, s, 'additional info');
   }
@@ -58,18 +59,16 @@ Future<bool> yourMethod() {
 }
 ```
 
+Note that nothing will be logged unless the value of an exception/error is provided, even if
+the stack trace and the context are given.
+
 ### Handling errors
 
-`scope()` executes a function and handles errors occurring in the function, according to
-specified conditions. Use both or either of `errorIf` and `criticalIf` to set the conditions
-of whether to treat the result of the function as non-critical/critical errors.
+[scope()][scope] executes a function, and handles errors occurring in there according to the
+conditions specified by `errorIf` and `criticalIf`. Use both or either of them to set the
+conditions of whether to treat the result of the function as non-critical/critical errors.
 
-You can customise the conditions for your preference by combining the function result and the
-error type received. (e.g. A certain process should be treated as a success if the result is
-valid regardless of a connection error, because data was not fetched from a remote server but
-obtained instead from the local database successfully.)
-
-If either of the conditions is met, the relevant handler of `onError` or `onCriticalError` is
+If either of the conditions is met, the relevant handler (`onError` or `onCriticalError`) is
 called with the function result and the error type passed in. Do some error handling in these
 handlers, like showing the error to the user.
 
@@ -83,19 +82,29 @@ final result = await errFlow.scope<bool>(
 );
 ```
 
+The handler functions receive the result and the error type, which means you can combine them
+to customise the conditions for your preference.
+
+e.g. To make the `onError` handler called when the process fails for reasons other than a
+connection error:
+
+```dart
+errorIf: (result, errorType) => !result && errorType != ErrorTypes.connection
+```
+
 ### Default error handlers
 
 You may want to consistently use a particular handler for non-critical errors, and the same or
 another one for critical errors. In such a case, `errorHandler` and `criticalErrorHandler` will
 come in handy. You can specify in advance how errors should be handled, and omit `onError` and
-`onCriticalError` in `scope()`.
+`onCriticalError` in [scope()][scope].
 
 ```dart
 void _errorHandler<T>(T result, ErrorTypes type) {
   if (type == ErrorTypes.foo) {
-    print('Critical error: $type');
+    // Handle the foo error
   } else {
-    print('Error: $type ($result)');
+    // Handle other errors
   }
 }
 
@@ -111,9 +120,36 @@ final result = await errFlow.scope<bool>(
 );
 ```
 
+### Logger
+
+To use the default logger, which simply prints information to the console, call
+[useDefaultLogger()][defaultlogger] before the first logging.
+
+```dart
+errFlow.useDefaultLogger();
+```
+
+If it is too simple and lacks functionality you need, set your own logger.
+
+```dart
+void _logger(dynamic e, StackTrace s, {dynamic context}) {
+  if (type == ErrorTypes.foo || type == ErrorTypes.bar) {
+    Crashlytics.instance.recordError(e, s, context: context);
+  } else {
+    print('Error: $e');
+  }
+}
+
+...
+
+errFlow.logger = _logger;
+```
+
+Set the default or a custom logger, otherwise an assertion error will occur in the debug mode.
+
 ### Adding/removing a listener
 
-This is usually unnecessary, but you can add a custom listener for your own needs.
+This is usually unnecessary, but you can add a custom listener for your special needs.
 
 ```dart
 void _listener({ErrorTypes type, dynamic exception, StackTrace stack, dynamic context}) {
@@ -128,3 +164,12 @@ errFlow.addListener(_listener);
 
 errFlow.removeListener(_listener);
 ```
+
+[errflow]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow-class.html
+[dispose]: https://pub.dev/documentation/errflow/latest/info/ErrInfo/dispose.html
+[set]: https://pub.dev/documentation/errflow/latest/info/ErrInfo/set.html
+[log]: https://pub.dev/documentation/errflow/latest/info/ErrInfo/log.html
+[logger]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/logger.html
+[lasterror]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/lastError.html
+[scope]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/scope.html
+[defaultlogger]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/useDefaultLogger.html

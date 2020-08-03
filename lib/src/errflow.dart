@@ -13,8 +13,17 @@ class ErrFlow<T> with ErrInfo<T> {
 
     addListener(
       ({T type, dynamic exception, StackTrace stack, dynamic context}) {
-        assert((exception != null && logger != null) ||
-            (stack == null && context == null));
+        assert(exception == null || logger != null, '''
+Information on an exception/error was provided by `set()` or `log()`
+while no logger is set.
+To fix, set a custom logger by assigning it to `logger`,
+or use the default logger by calling `useDefaultLogger()`.
+''');
+        assert((stack == null && context == null) || exception != null, '''
+Only the stack trace and/or the context, without information about
+the exception/error, were provided by `set()` or `log()`.
+To fix, provide also the exception/error.
+''');
 
         if (type != null) {
           _lastError = type;
@@ -103,9 +112,17 @@ class ErrFlow<T> with ErrInfo<T> {
     void Function(S, T) onCriticalError,
   }) async {
     assert(process != null);
-    assert(errorIf == null || (onError != null || errorHandler != null));
-    assert(criticalIf == null ||
-        (onCriticalError != null || criticalErrorHandler != null));
+    assert(errorIf == null || (onError != null || errorHandler != null), '''
+The handler for non-critical errors is missing while `errorIf` is specified.
+To fix, set the default or a custom handler by assigning it to `errorHandler`.
+''');
+    assert(
+        criticalIf == null ||
+            (onCriticalError != null || criticalErrorHandler != null),
+        '''
+The handler for critical errors is missing while `criticalErrorIf` is specified.
+To fix, set the default or a custom handler by assigning it to `criticalErrorHandler`.
+''');
 
     _lastError = defaultError;
     final result = await process();

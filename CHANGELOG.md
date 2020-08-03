@@ -1,3 +1,8 @@
+## 0.1.3 - 3 August 2020
+
+* Improve README.
+* Explain assertion errors.
+
 ## 0.1.2 - 15 July 2020
 
 * Enable omit_local_variable_types rule.
