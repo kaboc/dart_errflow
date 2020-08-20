@@ -6,6 +6,14 @@
 A Dart/Flutter package for making it somewhat easier to comprehend the flow of errors
 and handle them.
 
+---
+
+**apologies for the breaking changes in v0.1.4.**  
+Please see the [Changelog](https://pub.dev/packages/errflow/changelog) for the list of the changes.  
+The package should be safer now in exchange for the inconvenience caused by them.
+
+---
+
 ## Usage
 
 ### Initialisation and clean-up
