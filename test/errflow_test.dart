@@ -290,7 +290,7 @@ void main() {
       errFlow.logger = log.logger;
 
       errFlow.scope<void>((notifier) async {
-        notifier.set(null, 'foo', _StackTrace('bar'), 'baz');
+        notifier.set(200, 'foo', _StackTrace('bar'), 'baz');
         expect(log.exception, 'foo');
         expect(log.stack.toString(), 'bar');
         expect(log.context, 'baz');

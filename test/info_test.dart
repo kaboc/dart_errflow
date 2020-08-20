@@ -10,6 +10,10 @@ void main() {
       expect(notifier.lastError, 10);
     });
 
+    test('assert() fails if set() is called without error value', () {
+      expect(() => notifier.set(null), throwsA(isA<AssertionError>()));
+    });
+
     test('calling set() updates last error', () {
       notifier.set(1);
       expect(notifier.lastError, 1);
