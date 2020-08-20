@@ -1,0 +1,9 @@
+name: errflow_example
+description: An example of errflow.
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  errflow:
+    path: ../
