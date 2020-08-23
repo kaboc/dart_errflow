@@ -1,3 +1,8 @@
+## 0.2.0 - 24 August 2020
+
+* Correct version number.
+    * Minor version number should have been incremented for the last breaking changes.
+
 ## 0.1.4 - 20 August 2020
 
 * **BREAKING CHANGES** to fix a serious flaw in concurrency.
