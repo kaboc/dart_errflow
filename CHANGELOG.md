@@ -1,3 +1,7 @@
+## 0.2.1 - 24 August 2020
+
+* Fix inheritance relationship of IgnorableNotifier to be consistent with other classes.
+
 ## 0.2.0 - 24 August 2020
 
 * Correct version number.
