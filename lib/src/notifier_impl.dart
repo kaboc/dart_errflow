@@ -100,7 +100,7 @@ class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
   }
 }
 
-class IgnorableNotifier<T> extends IgnorableErrNotifier<T> with _State<T> {
+class IgnorableNotifier<T> with _State<T> implements IgnorableErrNotifier<T> {
   IgnorableNotifier(T defaultError) {
     _lastError = defaultError;
   }
