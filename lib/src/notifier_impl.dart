@@ -1,6 +1,6 @@
 import 'errflow.dart';
 
-class _State<T> {
+mixin _State<T> {
   Set<ErrListener<T>> _listeners;
   T _lastError;
 
