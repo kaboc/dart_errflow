@@ -13,6 +13,19 @@ void main() {
       );
     });
 
+    test('defaultValue has the default value set in constructor', () {
+      errFlow.scope<void>((notifier) async {
+        expect(errFlow.defaultValue, 100);
+      });
+    });
+
+    test('defaultValue does not change even if set() is called', () {
+      errFlow.scope<void>((notifier) async {
+        notifier.set(200);
+        expect(errFlow.defaultValue, 100);
+      });
+    });
+
     test('notifier in scope() has the default value', () async {
       await errFlow.scope<void>((notifier) async {
         notifier.set(200);

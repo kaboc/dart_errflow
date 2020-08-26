@@ -109,6 +109,12 @@ final result = await errFlow.scope<bool>(
 The handler functions receive the function result and the error value, which means you can
 combine them to customise the conditions for your preference.
 
+e.g. To trigger the `onError` handler if any error was set:
+
+```dart
+errorIf: (result, error) => error != errFlow.defaultError
+```
+
 e.g. To trigger the `onError` handler when the process fails for reasons other than a
 connection error:
 
