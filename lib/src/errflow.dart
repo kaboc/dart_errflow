@@ -9,10 +9,10 @@ class ErrFlow<T> {
   /// Creates an ErrFlow that facilitates handling and logging of errors.
   ///
   /// The generic type [T] is the type of error values. The provided
-  /// [defaultError] is used as the error value representing that there
-  /// is no error.
-  ErrFlow(T defaultError) {
-    _notifier = Notifier<T>(defaultError)
+  /// [defaultValue] is used as the initial value in notifiers,
+  /// representing that there is no error initially in each [scope()].
+  ErrFlow(T defaultValue) {
+    _notifier = Notifier<T>(defaultValue)
       ..addListener(
         ({T error, dynamic exception, StackTrace stack, dynamic context}) {
           assert(
@@ -128,11 +128,11 @@ class ErrFlow<T> {
   /// [ErrNotifier.set()] or [ErrNotifier.log()] on the object. Use the
   /// object also to access to [ErrNotifier.lastError] to see what the most
   /// resent error was. If there was no error, [ErrNotifier.lastError] holds
-  /// the default error value specified in the constructor of [ErrFlow].
+  /// the default value specified in the constructor of [ErrFlow].
   ///
   /// All of the other parameters are also functions, which receive the
   /// result of the [process] and the last error that occurred inside it.
-  /// If there is no error, the default error is provided as the last error.
+  /// If there is no error, the default value is provided as the last error.
   ///
   /// [onError] is called if [errorIf] returns true, and similarly
   /// [onCriticalError] is called if [criticalIf] returns true.

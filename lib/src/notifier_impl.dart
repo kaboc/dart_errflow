@@ -22,22 +22,22 @@ class _State<T> {
 }
 
 class Notifier<T> with _State<T> implements ErrNotifier<T> {
-  Notifier(T defaultError, {Set<ErrListener<T>> listeners})
-      : _defaultError = defaultError {
+  Notifier(T defaultValue, {Set<ErrListener<T>> listeners})
+      : _defaultValue = defaultValue {
     _listeners = listeners ?? {};
-    _lastError = defaultError;
+    _lastError = defaultValue;
   }
 
   factory Notifier.from(Notifier<T> notifier) {
     assert(notifier._listeners != null);
 
     return Notifier<T>(
-      notifier._defaultError,
+      notifier._defaultValue,
       listeners: Set.of(notifier._listeners),
     );
   }
 
-  final T _defaultError;
+  final T _defaultValue;
 
   @override
   void set(T error, [dynamic exception, StackTrace stack, dynamic context]) {
@@ -67,16 +67,16 @@ class Notifier<T> with _State<T> implements ErrNotifier<T> {
 }
 
 class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
-  LoggingNotifier(T defaultError, {Set<ErrListener<T>> listeners}) {
+  LoggingNotifier(T defaultValue, {Set<ErrListener<T>> listeners}) {
     _listeners = listeners ?? {};
-    _lastError = defaultError;
+    _lastError = defaultValue;
   }
 
   factory LoggingNotifier.from(Notifier<T> notifier) {
     assert(notifier._listeners != null);
 
     return LoggingNotifier(
-      notifier._defaultError,
+      notifier._defaultValue,
       listeners: Set.of(notifier._listeners),
     );
   }
@@ -101,12 +101,12 @@ class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
 }
 
 class IgnorableNotifier<T> with _State<T> implements IgnorableErrNotifier<T> {
-  IgnorableNotifier(T defaultError) {
-    _lastError = defaultError;
+  IgnorableNotifier(T defaultValue) {
+    _lastError = defaultValue;
   }
 
   factory IgnorableNotifier.from(Notifier<T> notifier) {
-    return IgnorableNotifier(notifier._defaultError);
+    return IgnorableNotifier(notifier._defaultValue);
   }
 
   @override

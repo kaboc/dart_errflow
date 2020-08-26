@@ -18,7 +18,8 @@ The package should be safer now in exchange for the inconvenience caused by them
 
 ### Initialisation and clean-up
 
-Instantiate [ErrFlow][errflow], with the default error value representing that there is no error.
+Instantiate [ErrFlow][errflow], with the default value representing that there is no error.
+The value is used as the initial value in the notifier of each [scope()][scope].
 
 When the [ErrFlow][errflow] object is no longer needed, call [dispose()][dispose] to ensure
 that the resources held in the object will not be used any more.

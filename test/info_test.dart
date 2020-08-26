@@ -6,7 +6,7 @@ void main() {
   group('ErrNotifier', () {
     final notifier = Notifier<int>(10);
 
-    test('default error value is set as lastError', () {
+    test('default value is set as lastError', () {
       expect(notifier.lastError, 10);
     });
 

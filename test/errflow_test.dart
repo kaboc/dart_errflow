@@ -10,7 +10,7 @@ void main() {
       expect(() => errFlow.scope<void>(null), throwsA(isA<AssertionError>()));
     });
 
-    test('notifier provided by scope() has the default error value', () {
+    test('notifier provided by scope() has the default value', () {
       errFlow.scope<void>((notifier) async {
         notifier.set(200);
       });
