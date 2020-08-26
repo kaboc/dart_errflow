@@ -39,13 +39,11 @@ class Notifier<T> with _State<T> implements ErrNotifier<T> {
     _lastError = defaultValue;
   }
 
-  factory Notifier.from(Notifier<T> notifier) {
+  Notifier.from(Notifier<T> notifier) : _defaultValue = notifier.defaultValue {
     assert(notifier._listeners != null);
 
-    return Notifier<T>(
-      notifier._defaultValue,
-      listeners: Set.of(notifier._listeners),
-    );
+    _listeners = Set.of(notifier._listeners);
+    _lastError = defaultValue;
   }
 
   final T _defaultValue;
@@ -82,18 +80,11 @@ class Notifier<T> with _State<T> implements ErrNotifier<T> {
 }
 
 class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
-  LoggingNotifier(T defaultValue, {Set<ErrListener<T>> listeners}) {
-    _listeners = listeners ?? {};
-    _lastError = defaultValue;
-  }
-
-  factory LoggingNotifier.from(Notifier<T> notifier) {
+  LoggingNotifier.from(Notifier<T> notifier) {
     assert(notifier._listeners != null);
 
-    return LoggingNotifier(
-      notifier._defaultValue,
-      listeners: Set.of(notifier._listeners),
-    );
+    _listeners = Set.of(notifier._listeners);
+    _lastError = notifier._defaultValue;
   }
 
   @override
@@ -119,12 +110,9 @@ class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
 }
 
 class IgnorableNotifier<T> with _State<T> implements IgnorableErrNotifier<T> {
-  IgnorableNotifier(T defaultValue) {
-    _lastError = defaultValue;
-  }
-
-  factory IgnorableNotifier.from(Notifier<T> notifier) {
-    return IgnorableNotifier(notifier._defaultValue);
+  IgnorableNotifier.from(Notifier<T> notifier) {
+    assert(notifier._listeners != null);
+    _lastError = notifier._defaultValue;
   }
 
   @override
