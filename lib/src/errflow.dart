@@ -208,7 +208,7 @@ class ErrFlow<T> {
   ///
   /// The object can be used to call [LoggingErrNotifier.set()] and
   /// [LoggingErrNotifier.log()], but calls to [LoggingErrNotifier.set()]
-  /// are proxied to the logger.
+  /// are forwarded to the logger.
   ///
   /// This is useful when you want errors set by [LoggingErrNotifier.set()]
   /// in [process] to be only logged instead of handled by the error
