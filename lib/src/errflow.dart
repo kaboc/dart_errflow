@@ -64,6 +64,11 @@ class ErrFlow<T> {
   /// operations to Crashlytics..
   void Function(dynamic, StackTrace, {dynamic context}) logger;
 
+  /// A getter for the value that was set in the constructor and is used as
+  /// the initial value for [lastError] in an object of the [ErrNotifier]
+  /// class and its variants in each [scope()].
+  T get defaultValue => _notifier.defaultValue;
+
   bool _debugAssertNotDisposed() {
     assert(() {
       if (_notifier == null) {
