@@ -19,6 +19,17 @@ class _State<T> {
     assert(_listeners != null);
     _listeners.remove(listener);
   }
+
+  int countListeners() {
+    assert(_listeners != null);
+    return _listeners.length;
+  }
+
+  String _toString(Type type) {
+    return '$type#$hashCode('
+        'listeners: ${_listeners == null ? 'null' : countListeners()}, '
+        'lastError: $lastError)';
+  }
 }
 
 class Notifier<T> with _State<T> implements ErrNotifier<T> {
@@ -38,6 +49,7 @@ class Notifier<T> with _State<T> implements ErrNotifier<T> {
   }
 
   final T _defaultValue;
+  T get defaultValue => _defaultValue;
 
   @override
   void set(T error, [dynamic exception, StackTrace stack, dynamic context]) {
@@ -64,6 +76,9 @@ class Notifier<T> with _State<T> implements ErrNotifier<T> {
       listener(exception: exception, stack: stack, context: context);
     }
   }
+
+  @override
+  String toString() => _toString((<T>() => T)<ErrNotifier<T>>());
 }
 
 class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
@@ -98,6 +113,9 @@ class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
       listener(exception: exception, stack: stack, context: context);
     }
   }
+
+  @override
+  String toString() => _toString((<T>() => T)<LoggingErrNotifier<T>>());
 }
 
 class IgnorableNotifier<T> with _State<T> implements IgnorableErrNotifier<T> {
@@ -117,4 +135,7 @@ class IgnorableNotifier<T> with _State<T> implements IgnorableErrNotifier<T> {
 
   @override
   void log(dynamic exception, [StackTrace stack, dynamic context]) {}
+
+  @override
+  String toString() => _toString((<T>() => T)<IgnorableErrNotifier<T>>());
 }
