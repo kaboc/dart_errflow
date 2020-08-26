@@ -108,16 +108,36 @@ class ErrFlow<T> {
   /// as the message of an exception and the stack trace to the console.
   void useDefaultLogger() {
     assert(_debugAssertNotDisposed());
+    logger = _defaultLogger;
+  }
 
-    logger = (dynamic exception, StackTrace stack, {dynamic context}) {
-      print(exception);
-      if (stack != null) {
-        print(stack);
-      }
-      if (context != null) {
-        print(context);
-      }
-    };
+  void _defaultLogger(dynamic exception, StackTrace stack, {dynamic context}) {
+    print(exception);
+    if (stack != null) {
+      print(stack);
+    }
+    if (context != null) {
+      print(context);
+    }
+  }
+
+  @override
+  String toString() {
+    if (_notifier == null) {
+      return '$runtimeType#$hashCode';
+    }
+
+    final hasErrorHandler = errorHandler != null;
+    final hasCriticalErrorHandler = criticalErrorHandler != null;
+    final hasLogger = logger != null;
+    final loggerType = logger == _defaultLogger ? 'default' : 'custom';
+
+    return '$runtimeType#$hashCode('
+        'listeners: ${_notifier.countListeners()}, '
+        'defaultValue: ${_notifier.defaultValue}, '
+        'errorHandler: ${hasErrorHandler ? 'set' : 'null'}, '
+        'criticalErrorHandler: ${hasCriticalErrorHandler ? 'set' : 'null'}, '
+        'logger: ${hasLogger ? loggerType : 'null'})';
   }
 
   /// Executes the provided function [process], and then calls either of
