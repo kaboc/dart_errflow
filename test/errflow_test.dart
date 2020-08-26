@@ -7,11 +7,14 @@ void main() {
 
   group('function passed to scope()', () {
     test('assert() fails if the function is null', () {
-      expect(() => errFlow.scope<void>(null), throwsA(isA<AssertionError>()));
+      expect(
+        () => errFlow.scope<void>(null),
+        throwsA(isA<AssertionError>()),
+      );
     });
 
-    test('notifier provided by scope() has the default value', () {
-      errFlow.scope<void>((notifier) async {
+    test('notifier in scope() has the default value', () async {
+      await errFlow.scope<void>((notifier) async {
         notifier.set(200);
       });
 
@@ -334,6 +337,38 @@ void main() {
       errFlow.ignorableScope<void>((notifier) async {
         expect(notifier, isA<IgnorableErrNotifier>());
       });
+    });
+
+    test('notifier in loggingScope() has the default value', () async {
+      await errFlow.loggingScope<void>((notifier) async {
+        notifier.set(200);
+      });
+
+      errFlow.loggingScope<void>((notifier) async {
+        expect(notifier.lastError, 100);
+      });
+    });
+
+    test('notifier in ignorableScope() has the default value', () async {
+      await errFlow.ignorableScope<void>((notifier) async {
+        notifier.set(200);
+      });
+
+      errFlow.ignorableScope<void>((notifier) async {
+        expect(notifier.lastError, 100);
+      });
+    });
+  });
+
+  group('dispose', () {
+    final errFlow2 = ErrFlow<int>(100);
+    errFlow2.dispose();
+
+    test('calling toString() after dispose() causes no error', () {
+      expect(
+        () => errFlow2.toString(),
+        isNot(throwsA(isA<AssertionError>())),
+      );
     });
   });
 }

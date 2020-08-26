@@ -106,10 +106,10 @@ final result = await errFlow.scope<bool>(
 );
 ```
 
-The handler functions receive the result and the error value, which means you can combine them
-to customise the conditions for your preference.
+The handler functions receive the function result and the error value, which means you can
+combine them to customise the conditions for your preference.
 
-e.g. To make the `onError` handler called when the process fails for reasons other than a
+e.g. To trigger the `onError` handler when the process fails for reasons other than a
 connection error:
 
 ```dart
@@ -127,7 +127,7 @@ it, or ignore it completely.
 
 `notifier` passed from [loggingScope][logging-scope] is an object of
  [LoggingErrNotifier][logging-notifier]. Calls on that object to [set()][logging-set] are
-proxied to [log()][logging-log], meaning that the error handlers are not triggered.
+forwarded to [log()][logging-log], meaning that the error handlers are not triggered.
 
 ```dart
 await errFlow.loggingScope<bool>(

@@ -20,8 +20,9 @@ abstract class ErrNotifier<T> {
   /// The latest error value that was notified most recently.
   T get lastError;
 
-  /// Calls all the registered listeners with error information including
-  /// the error value, the exception, etc.
+  /// Sets [error] to [lastError], and then calls all the registered
+  /// listeners with the error passed in, along with related information
+  /// if provided.
   void set(T error, [dynamic exception, StackTrace stack, dynamic context]);
 
   /// Calls all the registered listeners with error information, but
@@ -29,11 +30,12 @@ abstract class ErrNotifier<T> {
   void log(dynamic exception, [StackTrace stack, dynamic context]);
 }
 
-/// A variant of [ErrNotifier] that proxies calls to the [set()] method
+/// A variant of [ErrNotifier] that forwards calls to the [set()] method
 /// to [log()].
 @sealed
 abstract class LoggingErrNotifier<T> extends ErrNotifier<T> {
-  /// Updates [lastError] and delegates the notification task to [log()].
+  /// Updates [lastError], and then calls [log()] instead of calling one of
+  /// the error handlers.
   @override
   void set(T error, [dynamic exception, StackTrace stack, dynamic context]);
 

@@ -11,7 +11,10 @@ void main() {
     });
 
     test('assert() fails if set() is called without error value', () {
-      expect(() => notifier.set(null), throwsA(isA<AssertionError>()));
+      expect(
+        () => notifier.set(null),
+        throwsA(isA<AssertionError>()),
+      );
     });
 
     test('calling set() updates last error', () {
@@ -60,18 +63,6 @@ void main() {
       expect(notification1.errors, <int>[1, 2]);
       expect(notification2.errors, <int>[2, 3]);
     });
-
-    test('cannot be used after disposed', () {
-      final notification = _Notification();
-
-      notifier
-        ..addListener(notification.listener)
-        ..set(1)
-        ..dispose();
-
-      expect(notification.errors, <int>[1]);
-      expect(() => notifier.set(2), throwsA(isA<AssertionError>()));
-    });
   });
 
   group('LoggingErrNotifier', () {
@@ -88,7 +79,7 @@ void main() {
       expect(notifier.lastError, 10);
     });
 
-    test('a call to set() is proxied to log()', () {
+    test('a call to set() is forwarded to log()', () {
       final notification = _Notification();
       loggingNotifier
         ..addListener(notification.listener)
@@ -132,6 +123,28 @@ void main() {
     test('calling set() does not update last error in original object', () {
       ignorableNotifier.set(1);
       expect(notifier.lastError, 10);
+    });
+  });
+
+  group('dispose', () {
+    final notifier = Notifier<int>(10);
+    final notification = _Notification();
+
+    notifier
+      ..addListener(notification.listener)
+      ..set(1)
+      ..dispose();
+
+    test('cannot be used after disposed', () {
+      expect(notification.errors, <int>[1]);
+      expect(() => notifier.set(2), throwsA(isA<AssertionError>()));
+    });
+
+    test('calling toString() after dispose() causes no error', () {
+      expect(
+        () => notifier.toString(),
+        isNot(throwsA(isA<AssertionError>())),
+      );
     });
   });
 }
