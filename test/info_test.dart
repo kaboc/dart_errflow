@@ -63,6 +63,14 @@ void main() {
       expect(notification1.errors, <int>[1, 2]);
       expect(notification2.errors, <int>[2, 3]);
     });
+
+    test('hasError returns an appropriate value', () {
+      final newNotifier = Notifier<int>(10);
+      expect(newNotifier.hasError, false);
+
+      newNotifier.set(1);
+      expect(newNotifier.hasError, true);
+    });
   });
 
   group('LoggingErrNotifier', () {
@@ -102,6 +110,14 @@ void main() {
       expect(notification.stacks, ['bar']);
       expect(notification.contexts, ['baz']);
     });
+
+    test('hasError returns an appropriate value', () {
+      final newLoggingNotifier = LoggingNotifier<int>.from(notifier);
+      expect(newLoggingNotifier.hasError, false);
+
+      newLoggingNotifier.set(1);
+      expect(newLoggingNotifier.hasError, true);
+    });
   });
 
   group('IgnorableErrNotifier', () {
@@ -123,6 +139,14 @@ void main() {
     test('calling set() does not update last error in original object', () {
       ignorableNotifier.set(1);
       expect(notifier.lastError, 10);
+    });
+
+    test('hasError returns an appropriate value', () {
+      final newIgnorableNotifier = IgnorableNotifier<int>.from(notifier);
+      expect(newIgnorableNotifier.hasError, false);
+
+      newIgnorableNotifier.set(1);
+      expect(newIgnorableNotifier.hasError, true);
     });
   });
 

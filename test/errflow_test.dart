@@ -49,6 +49,14 @@ void main() {
       );
       expect(result, 200);
     });
+
+    test('hasError returns an appropriate value', () {
+      errFlow.scope<void>((notifier) async {
+        expect(notifier.hasError, false);
+        notifier.set(200);
+        expect(notifier.hasError, true);
+      });
+    });
   });
 
   group('errorIf / onError', () {
@@ -369,6 +377,22 @@ void main() {
 
       errFlow.ignorableScope<void>((notifier) async {
         expect(notifier.lastError, 100);
+      });
+    });
+
+    test('hasError returns an appropriate value in loggingScope', () {
+      errFlow.loggingScope<void>((notifier) async {
+        expect(notifier.hasError, false);
+        notifier.set(200);
+        expect(notifier.hasError, true);
+      });
+    });
+
+    test('hasError returns an appropriate value in loggingScope', () {
+      errFlow.ignorableScope<void>((notifier) async {
+        expect(notifier.hasError, false);
+        notifier.set(200);
+        expect(notifier.hasError, true);
       });
     });
   });

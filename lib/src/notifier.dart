@@ -20,6 +20,10 @@ abstract class ErrNotifier<T> {
   /// The latest error value that was notified most recently.
   T get lastError;
 
+  /// Whether or not there was an error. `true` is returned if [lastError]
+  /// is not equal to the default value.
+  bool get hasError;
+
   /// Sets [error] to [lastError], and then calls all the registered
   /// listeners with the error passed in, along with related information
   /// if provided.

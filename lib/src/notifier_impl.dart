@@ -2,9 +2,12 @@ import 'errflow.dart';
 
 mixin _State<T> {
   Set<ErrListener<T>> _listeners;
+  T _defaultValue;
   T _lastError;
 
+  T get defaultValue => _defaultValue;
   T get lastError => _lastError;
+  bool get hasError => _lastError != _defaultValue;
 
   void dispose() {
     _lastError = _listeners = null;
@@ -33,21 +36,19 @@ mixin _State<T> {
 }
 
 class Notifier<T> with _State<T> implements ErrNotifier<T> {
-  Notifier(T defaultValue, {Set<ErrListener<T>> listeners})
-      : _defaultValue = defaultValue {
+  Notifier(T defaultValue, {Set<ErrListener<T>> listeners}) {
+    _defaultValue = defaultValue;
     _listeners = listeners ?? {};
     _lastError = defaultValue;
   }
 
-  Notifier.from(Notifier<T> notifier) : _defaultValue = notifier.defaultValue {
+  Notifier.from(Notifier<T> notifier) {
     assert(notifier._listeners != null);
 
+    _defaultValue = notifier.defaultValue;
     _listeners = Set.of(notifier._listeners);
-    _lastError = defaultValue;
+    _lastError = _defaultValue;
   }
-
-  final T _defaultValue;
-  T get defaultValue => _defaultValue;
 
   @override
   void set(T error, [dynamic exception, StackTrace stack, dynamic context]) {
@@ -83,8 +84,9 @@ class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
   LoggingNotifier.from(Notifier<T> notifier) {
     assert(notifier._listeners != null);
 
+    _defaultValue = notifier.defaultValue;
     _listeners = Set.of(notifier._listeners);
-    _lastError = notifier._defaultValue;
+    _lastError = _defaultValue;
   }
 
   @override
@@ -112,7 +114,9 @@ class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
 class IgnorableNotifier<T> with _State<T> implements IgnorableErrNotifier<T> {
   IgnorableNotifier.from(Notifier<T> notifier) {
     assert(notifier._listeners != null);
-    _lastError = notifier._defaultValue;
+
+    _defaultValue = notifier.defaultValue;
+    _lastError = _defaultValue;
   }
 
   @override
