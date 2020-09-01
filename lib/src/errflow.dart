@@ -159,11 +159,11 @@ class ErrFlow<T> {
   /// result of the [process] and the last error that occurred inside it.
   /// If there is no error, the default value is provided as the last error.
   ///
-  /// [onError] is called if [errorIf] returns true, and similarly
-  /// [onCriticalError] is called if [criticalIf] returns true.
-  /// If [errorIf] is specified, either [onError] or [errorHandler] must
-  /// be specified too. The same applies to [criticalIf] and
-  /// [onCriticalError] / [criticalErrorHandler].
+  /// [onError] (or [errorHandler] if [onError] is not specified) is called
+  /// if [errorIf] returns true, and similarly, [onCriticalError] (or
+  /// [criticalErrorHandler]) is called if [criticalIf] returns true.
+  /// The condition of [criticalIf] is evaluated prior to that of [errorIf],
+  /// and the latter is ignored if the former is met.
   Future<S> scope<S>(
     Future<S> Function(ErrNotifier<T>) process, {
     bool Function(S, T) errorIf,

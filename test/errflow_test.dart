@@ -178,7 +178,7 @@ void main() {
   });
 
   group('criticalIf / onCriticalError', () {
-    test('onError is ignored if onCriticalError is set', () {
+    test('errorIf is ignored if condition of criticalIf is met', () {
       errFlow.scope<bool>(
         (_) => null,
         errorIf: (_, __) => true,
