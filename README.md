@@ -66,6 +66,11 @@ Future<bool> yourMethod(ErrNotifier notifier) {
     notifier.log(e, s, 'additional info');
   }
 
+  // You can use hasError to check if some error was set. 
+  if (notifier.hasError) {
+    ...
+  }
+
   return false;
 }
 ```
