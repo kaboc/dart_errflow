@@ -1,3 +1,15 @@
+## 0.2.2 - 2 September 2020
+
+* Internal changes
+    * Rename `defaultError` to `defaultValue`.
+    * Change `_State` class to `mixin`.
+    * Change factory constructors to named constructors.
+* New features
+    * Add `toString()` to each public class for better outputs by `print()`.
+    * Add `defaultValue` to `ErrFlow`.
+    * Add `hasError` to `ErrNotifier`, `LoggingErrNotifier` and `IgnorableErrNotifier`.
+* Small improvements of documentation
+
 ## 0.2.1 - 24 August 2020
 
 * Fix inheritance relationship of IgnorableNotifier to be consistent with other classes.
