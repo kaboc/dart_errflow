@@ -293,7 +293,7 @@ void main() {
         notifier.log('foo', _StackTrace('bar'), 'baz');
         expect(log.exception, 'foo');
         expect(log.stack.toString(), 'bar');
-        expect(log.context, 'baz');
+        expect(log.reason, 'baz');
       });
     });
 
@@ -305,7 +305,7 @@ void main() {
         notifier.log('foo', _StackTrace('bar'));
         expect(log.exception, 'foo');
         expect(log.stack.toString(), 'bar');
-        expect(log.context, isNull);
+        expect(log.reason, isNull);
       });
     });
 
@@ -317,7 +317,7 @@ void main() {
         notifier.set(200, 'foo', _StackTrace('bar'), 'baz');
         expect(log.exception, 'foo');
         expect(log.stack.toString(), 'bar');
-        expect(log.context, 'baz');
+        expect(log.reason, 'baz');
       });
     });
 
@@ -413,12 +413,12 @@ void main() {
 class _Log {
   dynamic exception;
   StackTrace stack;
-  dynamic context;
+  dynamic reason;
 
-  void logger(dynamic e, StackTrace s, {dynamic context}) {
+  Future<void> logger(dynamic e, StackTrace s, {dynamic reason}) async {
     exception = e;
     stack = s;
-    this.context = context;
+    this.reason = reason;
   }
 }
 

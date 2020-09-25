@@ -203,7 +203,7 @@ errFlow.useDefaultLogger();
 If it lacks functionality you need, set your own logger.
 
 ```dart
-void _logger(dynamic e, StackTrace s, {dynamic context}) {
+Future<void> _logger(dynamic e, StackTrace s, {dynamic reason}) async {
   // Logging operations
 }
 

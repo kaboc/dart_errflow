@@ -30,7 +30,7 @@ class ErrFlow<T> {
           );
 
           if (logger != null && exception != null) {
-            logger(exception, stack, context: context);
+            logger(exception, stack, reason: context);
           }
         },
       );
@@ -59,10 +59,11 @@ class ErrFlow<T> {
   /// A logger function that is called when an error is notified.
   ///
   /// The signature matches that of the `recordError()` method in the
-  /// official `firebase_crashlytics` plugin package, and thus the method
-  /// can be assigned to this logger as is, if you want to leave logging
-  /// operations to Crashlytics..
-  void Function(dynamic, StackTrace, {dynamic context}) logger;
+  /// `firebase_crashlytics` package (although this logger does not have
+  /// some named parameters existing in `recordError()`), and thus the
+  /// `FirebaseCrashlytics.recordError` can be assigned to the logger as is
+  /// if you want to leave logging operations to Crashlytics.
+  Future<void> Function(dynamic, StackTrace, {dynamic reason}) logger;
 
   /// A getter for the value that was set in the constructor and is used as
   /// the initial value for [lastError] in an object of the [ErrNotifier]
@@ -116,13 +117,14 @@ class ErrFlow<T> {
     logger = _defaultLogger;
   }
 
-  void _defaultLogger(dynamic exception, StackTrace stack, {dynamic context}) {
+  Future<void> _defaultLogger(dynamic exception, StackTrace stack,
+      {dynamic reason}) async {
     print(exception);
     if (stack != null) {
       print(stack);
     }
-    if (context != null) {
-      print(context);
+    if (reason != null) {
+      print(reason);
     }
   }
 
