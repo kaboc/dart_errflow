@@ -1,3 +1,9 @@
+## 0.3.0 - 25 September 2020
+
+* **BREAKING CHANGE**
+    * Change logger signature in accordance with new api of flutter_crashlytics package.
+* Update documentation and dependencies.
+
 ## 0.2.2 - 2 September 2020
 
 * Internal changes
