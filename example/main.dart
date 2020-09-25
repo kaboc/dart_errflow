@@ -13,6 +13,8 @@ Future<void> main() async {
     ..criticalErrorHandler = errorHandler;
 
   for (var i = -2; i <= 2; i++) {
+    // Executes the dividedBy() method, and calls criticalErrorHandler
+    // if the last error is critical at the point when the method ends.
     final result = await errFlow.scope<int>(
       (notifier) async => dividedBy(notifier, 10, i),
       criticalIf: (result, error) => error == ErrorTypes.critical,
@@ -36,6 +38,8 @@ int dividedBy(ErrNotifier notifier, int v1, int v2) {
 
   int result;
 
+  // Treats the exception caused by division by zero as a critical error,
+  // and logs other exceptions (which in fact never occur in this example).
   try {
     result = v1 ~/ v2;
   } on IntegerDivisionByZeroException catch (e, s) {

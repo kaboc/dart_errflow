@@ -93,10 +93,10 @@ you spot whether the method requires error handling.
 
 ### Handling errors
 
-[scope()][scope] executes a function, and handles errors occurring inside there according to
-the conditions specified by `errorIf` and `criticalIf`. Use both or either of them to set the
-conditions of whether to treat the result of the function as non-critical/critical errors.
-The condition of `criticalIf` is evaluated prior to that of `errorIf`.
+[scope()][scope] executes a function, and handles errors occurring inside there when the function
+finishes according to the conditions specified by `errorIf` and `criticalIf`. Use both or either
+of them to set the conditions of whether to treat the function result as a non-critical/critical
+error. The condition of `criticalIf` is evaluated prior to that of `errorIf`.
 
 If either of the conditions is met, the relevant handler, `onError` or `onCriticalError`, is
 called. Do some error handling in these handlers, like showing different messages depending

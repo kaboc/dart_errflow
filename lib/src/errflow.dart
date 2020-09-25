@@ -165,7 +165,7 @@ class ErrFlow<T> {
   /// if [errorIf] returns true, and similarly, [onCriticalError] (or
   /// [criticalErrorHandler]) is called if [criticalIf] returns true.
   /// The condition of [criticalIf] is evaluated prior to that of [errorIf],
-  /// and the latter is ignored if the former is met.
+  /// and the latter is ignored if the former condition is met.
   Future<S> scope<S>(
     Future<S> Function(ErrNotifier<T>) process, {
     bool Function(S, T) errorIf,
