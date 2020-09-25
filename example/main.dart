@@ -23,7 +23,7 @@ Future<void> main() async {
   errFlow.dispose();
 }
 
-void logger(dynamic e, StackTrace s, {dynamic context}) {
+Future<void> logger(dynamic e, StackTrace s, {dynamic reason}) async {
   print('Logged: $e');
 }
 
