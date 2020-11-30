@@ -15,14 +15,14 @@ void main() {
 
     test('defaultValue has the default value set in constructor', () {
       errFlow.scope<void>((notifier) async {
-        expect(errFlow.defaultValue, 100);
+        expect(errFlow.defaultValue, equals(100));
       });
     });
 
     test('defaultValue does not change even if set() is called', () {
       errFlow.scope<void>((notifier) async {
         notifier.set(200);
-        expect(errFlow.defaultValue, 100);
+        expect(errFlow.defaultValue, equals(100));
       });
     });
 
@@ -32,14 +32,14 @@ void main() {
       });
 
       errFlow.scope<void>((notifier) async {
-        expect(notifier.lastError, 100);
+        expect(notifier.lastError, equals(100));
       });
     });
 
     test('lastError is updated when set() is called', () {
       errFlow.scope<void>((notifier) async {
         notifier.set(200);
-        expect(notifier.lastError, 200);
+        expect(notifier.lastError, equals(200));
       });
     });
 
@@ -47,14 +47,14 @@ void main() {
       final result = await errFlow.scope<int>(
         (_) => Future<int>.value(200),
       );
-      expect(result, 200);
+      expect(result, equals(200));
     });
 
     test('hasError returns an appropriate value', () {
       errFlow.scope<void>((notifier) async {
-        expect(notifier.hasError, false);
+        expect(notifier.hasError, isFalse);
         notifier.set(200);
-        expect(notifier.hasError, true);
+        expect(notifier.hasError, isTrue);
       });
     });
   });
@@ -73,7 +73,7 @@ void main() {
     test('onError is called even without set() if errorIf is true', () async {
       var r = false;
 
-      await errFlow.scope<String>(
+      await errFlow.scope<void>(
         (_) => null,
         errorIf: (_, __) => true,
         onError: (_, __) => r = true,
@@ -83,13 +83,13 @@ void main() {
     });
 
     test('onError is called only when errorIf is true', () {
-      errFlow.scope<String>(
+      errFlow.scope<void>(
         (_) => null,
         errorIf: (_, __) => false,
         onError: (_, __) => expect(false, isTrue),
       );
 
-      errFlow.scope<String>(
+      errFlow.scope<void>(
         (_) => null,
         errorIf: (_, __) => true,
         onError: (_, __) => expect(true, isTrue),
@@ -103,13 +103,13 @@ void main() {
           return 'foo';
         }),
         errorIf: (String result, int error) {
-          expect(result, 'foo');
-          expect(error, 200);
+          expect(result, equals('foo'));
+          expect(error, equals(200));
           return true;
         },
         onError: (String result, int error) {
-          expect(result, 'foo');
-          expect(error, 200);
+          expect(result, equals('foo'));
+          expect(error, equals(200));
         },
       );
     });
@@ -134,7 +134,7 @@ void main() {
       () async {
         var r = false;
 
-        await errFlow.scope<String>(
+        await errFlow.scope<void>(
           (_) => null,
           criticalIf: (_, __) => true,
           onCriticalError: (_, __) => r = true,
@@ -145,13 +145,13 @@ void main() {
     );
 
     test('onCriticalError is called only when criticalIf is true', () {
-      errFlow.scope<String>(
+      errFlow.scope<void>(
         (_) => null,
         criticalIf: (_, __) => false,
         onCriticalError: (_, __) => expect(false, isTrue),
       );
 
-      errFlow.scope<String>(
+      errFlow.scope<void>(
         (_) => null,
         criticalIf: (_, __) => true,
         onCriticalError: (_, __) => expect(true, isTrue),
@@ -165,13 +165,13 @@ void main() {
           return 'foo';
         }),
         criticalIf: (String result, int error) {
-          expect(result, 'foo');
-          expect(error, 200);
+          expect(result, equals('foo'));
+          expect(error, equals(200));
           return true;
         },
         onCriticalError: (String result, int error) {
-          expect(result, 'foo');
-          expect(error, 200);
+          expect(result, equals('foo'));
+          expect(error, equals(200));
         },
       );
     });
@@ -179,7 +179,7 @@ void main() {
 
   group('criticalIf / onCriticalError', () {
     test('errorIf is ignored if condition of criticalIf is met', () {
-      errFlow.scope<bool>(
+      errFlow.scope<void>(
         (_) => null,
         errorIf: (_, __) => true,
         criticalIf: (_, __) => true,
@@ -211,7 +211,7 @@ void main() {
 
       errFlow.errorHandler = <bool>(_, __) => r1 = true;
 
-      await errFlow.scope<bool>(
+      await errFlow.scope<void>(
         (_) => null,
         errorIf: (_, __) => true,
         onError: (_, __) => r2 = true,
@@ -242,7 +242,7 @@ void main() {
 
       errFlow.errorHandler = <bool>(_, __) => r1 = true;
 
-      await errFlow.scope<bool>(
+      await errFlow.scope<void>(
         (_) => null,
         criticalIf: (_, __) => true,
         onCriticalError: (_, __) => r2 = true,
@@ -267,16 +267,16 @@ void main() {
           (notifier) async {
             notifier.set(200);
             await Future<void>.delayed(const Duration(milliseconds: 100));
-            expect(notifier.lastError, 200);
+            expect(notifier.lastError, equals(200));
           },
-          onError: (result, error) => expect(error, 200),
+          onError: (result, error) => expect(error, equals(200)),
         ),
         errFlow.scope<void>(
           (notifier) async {
             notifier.set(300);
-            expect(notifier.lastError, 300);
+            expect(notifier.lastError, equals(300));
           },
-          onError: (result, error) => expect(error, 300),
+          onError: (result, error) => expect(error, equals(300)),
         ),
       ]);
 
@@ -291,9 +291,9 @@ void main() {
 
       errFlow.scope<void>((notifier) async {
         notifier.log('foo', _StackTrace('bar'), 'baz');
-        expect(log.exception, 'foo');
-        expect(log.stack.toString(), 'bar');
-        expect(log.reason, 'baz');
+        expect(log.exception, equals('foo'));
+        expect(log.stack.toString(), equals('bar'));
+        expect(log.reason, equals('baz'));
       });
     });
 
@@ -303,8 +303,8 @@ void main() {
 
       errFlow.scope<void>((notifier) async {
         notifier.log('foo', _StackTrace('bar'));
-        expect(log.exception, 'foo');
-        expect(log.stack.toString(), 'bar');
+        expect(log.exception, equals('foo'));
+        expect(log.stack.toString(), equals('bar'));
         expect(log.reason, isNull);
       });
     });
@@ -315,9 +315,9 @@ void main() {
 
       errFlow.scope<void>((notifier) async {
         notifier.set(200, 'foo', _StackTrace('bar'), 'baz');
-        expect(log.exception, 'foo');
-        expect(log.stack.toString(), 'bar');
-        expect(log.reason, 'baz');
+        expect(log.exception, equals('foo'));
+        expect(log.stack.toString(), equals('bar'));
+        expect(log.reason, equals('baz'));
       });
     });
 
@@ -366,7 +366,7 @@ void main() {
       });
 
       errFlow.loggingScope<void>((notifier) async {
-        expect(notifier.lastError, 100);
+        expect(notifier.lastError, equals(100));
       });
     });
 
@@ -376,23 +376,23 @@ void main() {
       });
 
       errFlow.ignorableScope<void>((notifier) async {
-        expect(notifier.lastError, 100);
+        expect(notifier.lastError, equals(100));
       });
     });
 
     test('hasError returns an appropriate value in loggingScope', () {
       errFlow.loggingScope<void>((notifier) async {
-        expect(notifier.hasError, false);
+        expect(notifier.hasError, isFalse);
         notifier.set(200);
-        expect(notifier.hasError, true);
+        expect(notifier.hasError, isTrue);
       });
     });
 
     test('hasError returns an appropriate value in loggingScope', () {
       errFlow.ignorableScope<void>((notifier) async {
-        expect(notifier.hasError, false);
+        expect(notifier.hasError, isFalse);
         notifier.set(200);
-        expect(notifier.hasError, true);
+        expect(notifier.hasError, isTrue);
       });
     });
   });
@@ -400,6 +400,15 @@ void main() {
   group('dispose', () {
     final errFlow2 = ErrFlow<int>(100);
     errFlow2.dispose();
+
+    test('cannot be used after disposed', () {
+      final listener =
+          ({int error, Object exception, StackTrace stack, Object context}) {};
+      expect(
+        () => errFlow2.addListener(listener),
+        throwsA(isA<AssertionError>()),
+      );
+    });
 
     test('calling toString() after dispose() causes no error', () {
       expect(
