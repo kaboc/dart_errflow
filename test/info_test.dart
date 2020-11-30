@@ -10,13 +10,6 @@ void main() {
       expect(notifier.lastError, equals(10));
     });
 
-    test('assert() fails if set() is called without error value', () {
-      expect(
-        () => notifier.set(null),
-        throwsA(isA<AssertionError>()),
-      );
-    });
-
     test('calling set() updates last error', () {
       notifier.set(1);
       expect(notifier.lastError, equals(1));
@@ -175,12 +168,12 @@ void main() {
 
 class _Notification {
   List errors = <int>[];
-  List exceptions = <dynamic>[];
+  List exceptions = <Object>[];
   List stacks = <String>[];
-  List contexts = <dynamic>[];
+  List contexts = <Object>[];
 
   void listener(
-      {int error, dynamic exception, StackTrace stack, dynamic context}) {
+      {int? error, Object? exception, StackTrace? stack, Object? context}) {
     if (error != null) {
       errors.add(error);
     }

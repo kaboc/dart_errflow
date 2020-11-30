@@ -218,7 +218,7 @@ errFlow.useDefaultLogger();
 If it lacks functionality you need, set your own logger.
 
 ```dart
-Future<void> _logger(dynamic e, StackTrace s, {dynamic reason}) async {
+Future<void> _logger(Object? e, StackTrace? s, {Object? reason}) async {
   // Logging operations
 }
 
@@ -246,7 +246,7 @@ in the debug mode.
 This is usually unnecessary, but you can add a custom listener for your special needs.
 
 ```dart
-void _listener({ErrorTypes error, dynamic exception, StackTrace stack, dynamic context}) {
+void _listener({ErrorTypes? error, Object? exception, StackTrace? stack, Object? context}) {
   // Some processing
 }
 

@@ -15,7 +15,7 @@ Future<void> main() async {
   for (var i = -2; i <= 2; i++) {
     // Executes the dividedBy() method, and calls criticalErrorHandler
     // if the last error is critical at the point when the method ends.
-    final result = await errFlow.scope<int>(
+    final result = await errFlow.scope<int?>(
       (notifier) async => dividedBy(notifier, 10, i),
       criticalIf: (result, error) => error == ErrorTypes.critical,
     );
@@ -25,7 +25,7 @@ Future<void> main() async {
   errFlow.dispose();
 }
 
-Future<void> logger(dynamic e, StackTrace s, {dynamic reason}) async {
+Future<void> logger(Object? e, StackTrace? s, {Object? reason}) async {
   print('Logged: $e');
 }
 
@@ -33,10 +33,10 @@ void errorHandler<T>(T result, ErrorTypes error) {
   print('Error: $error');
 }
 
-int dividedBy(ErrNotifier notifier, int v1, int v2) {
+int? dividedBy(ErrNotifier notifier, int v1, int v2) {
   print('\n$v1 ~/ $v2');
 
-  int result;
+  int? result;
 
   // Treats the exception caused by division by zero as a critical error,
   // and logs other exceptions (which in fact never occur in this example).

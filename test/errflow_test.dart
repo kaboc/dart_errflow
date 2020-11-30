@@ -6,13 +6,6 @@ void main() {
   final errFlow = ErrFlow<int>(100);
 
   group('function passed to scope()', () {
-    test('assert() fails if the function is null', () {
-      expect(
-        () => errFlow.scope<void>(null),
-        throwsA(isA<AssertionError>()),
-      );
-    });
-
     test('defaultValue has the default value set in constructor', () {
       errFlow.scope<void>((notifier) async {
         expect(errFlow.defaultValue, equals(100));
@@ -63,7 +56,7 @@ void main() {
     test('assert() fails if both onError and eventHandler are missing', () {
       expect(
         () => errFlow.scope<void>(
-          (_) => null,
+          (_) async {},
           errorIf: (_, __) => true,
         ),
         throwsA(isA<AssertionError>()),
@@ -74,7 +67,7 @@ void main() {
       var r = false;
 
       await errFlow.scope<void>(
-        (_) => null,
+        (_) async {},
         errorIf: (_, __) => true,
         onError: (_, __) => r = true,
       );
@@ -84,13 +77,13 @@ void main() {
 
     test('onError is called only when errorIf is true', () {
       errFlow.scope<void>(
-        (_) => null,
+        (_) async {},
         errorIf: (_, __) => false,
         onError: (_, __) => expect(false, isTrue),
       );
 
       errFlow.scope<void>(
-        (_) => null,
+        (_) async {},
         errorIf: (_, __) => true,
         onError: (_, __) => expect(true, isTrue),
       );
@@ -121,7 +114,7 @@ void main() {
       () {
         expect(
           () => errFlow.scope<void>(
-            (_) => null,
+            (_) async {},
             criticalIf: (_, __) => true,
           ),
           throwsA(isA<AssertionError>()),
@@ -135,7 +128,7 @@ void main() {
         var r = false;
 
         await errFlow.scope<void>(
-          (_) => null,
+          (_) async {},
           criticalIf: (_, __) => true,
           onCriticalError: (_, __) => r = true,
         );
@@ -146,13 +139,13 @@ void main() {
 
     test('onCriticalError is called only when criticalIf is true', () {
       errFlow.scope<void>(
-        (_) => null,
+        (_) async {},
         criticalIf: (_, __) => false,
         onCriticalError: (_, __) => expect(false, isTrue),
       );
 
       errFlow.scope<void>(
-        (_) => null,
+        (_) async {},
         criticalIf: (_, __) => true,
         onCriticalError: (_, __) => expect(true, isTrue),
       );
@@ -180,7 +173,7 @@ void main() {
   group('criticalIf / onCriticalError', () {
     test('errorIf is ignored if condition of criticalIf is met', () {
       errFlow.scope<void>(
-        (_) => null,
+        (_) async {},
         errorIf: (_, __) => true,
         criticalIf: (_, __) => true,
         onError: (_, __) => expect(false, isTrue),
@@ -212,7 +205,7 @@ void main() {
       errFlow.errorHandler = <bool>(_, __) => r1 = true;
 
       await errFlow.scope<void>(
-        (_) => null,
+        (_) async {},
         errorIf: (_, __) => true,
         onError: (_, __) => r2 = true,
       );
@@ -243,7 +236,7 @@ void main() {
       errFlow.errorHandler = <bool>(_, __) => r1 = true;
 
       await errFlow.scope<void>(
-        (_) => null,
+        (_) async {},
         criticalIf: (_, __) => true,
         onCriticalError: (_, __) => r2 = true,
       );
@@ -256,9 +249,9 @@ void main() {
   group('concurrency', () {
     test('error in a scope does not affect another concurrent scope', () async {
       var i = 0;
-      final listener =
-          ({int error, dynamic exception, StackTrace stack, dynamic context}) {
-        expect(error, ++i == 1 ? 200 : 300);
+      final listener = (
+          {int? error, Object? exception, StackTrace? stack, Object? context}) {
+        expect(error, equals(++i == 1 ? 200 : 300));
       };
       errFlow.addListener(listener);
 
@@ -331,20 +324,6 @@ void main() {
         );
       });
     });
-
-    test(
-      'assert() fails if log() is called with stack/context but without exception',
-      () {
-        errFlow.useDefaultLogger();
-
-        errFlow.scope<void>((notifier) async {
-          expect(
-            () => notifier.log(null, _StackTrace('bar'), 'baz'),
-            throwsA(isA<AssertionError>()),
-          );
-        });
-      },
-    );
   });
 
   group('loggingScope() and ignorableScope()', () {
@@ -402,8 +381,11 @@ void main() {
     errFlow2.dispose();
 
     test('cannot be used after disposed', () {
-      final listener =
-          ({int error, Object exception, StackTrace stack, Object context}) {};
+      final listener = (
+          {int? error,
+          Object? exception,
+          StackTrace? stack,
+          Object? context}) {};
       expect(
         () => errFlow2.addListener(listener),
         throwsA(isA<AssertionError>()),
@@ -420,11 +402,11 @@ void main() {
 }
 
 class _Log {
-  dynamic exception;
-  StackTrace stack;
-  dynamic reason;
+  late Object exception;
+  StackTrace? stack;
+  Object? reason;
 
-  Future<void> logger(dynamic e, StackTrace s, {dynamic reason}) async {
+  Future<void> logger(Object e, StackTrace? s, {Object? reason}) async {
     exception = e;
     stack = s;
     this.reason = reason;

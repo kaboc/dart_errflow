@@ -1,3 +1,7 @@
+## 0.4.0-nullsafety.0 - 30 November 2020
+
+* Migrate to null safety.
+
 ## 0.3.0 - 25 September 2020
 
 * **BREAKING CHANGE**
