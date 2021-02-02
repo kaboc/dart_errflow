@@ -16,7 +16,7 @@ Future<void> main() async {
     // Executes the dividedBy() method, and calls criticalErrorHandler
     // if the last error is critical at the point when the method ends.
     final result = await errFlow.scope<int?>(
-      (notifier) async => dividedBy(notifier, 10, i),
+      (notifier) => dividedBy(notifier, 10, i),
       criticalIf: (result, error) => error == ErrorTypes.critical,
     );
     print('= $result');
