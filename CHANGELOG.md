@@ -1,3 +1,9 @@
+## 0.3.1 - 2 February 2021
+
+* Fix the issue of `Loggingnotifier.set()` not passing the provided error to listeners.
+* Change the return types of scopes and logger from `Future` to `FutureOr`.
+* Minor improvements of documentation, tests, etc.
+
 ## 0.3.0 - 25 September 2020
 
 * **BREAKING CHANGE**

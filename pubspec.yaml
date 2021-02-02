@@ -1,6 +1,6 @@
 name: errflow
 description: A package for making it somewhat easier to comprehend the flow of errors and handle them.
-version: 0.3.0
+version: 0.3.1
 homepage: https://github.com/kaboc/dart_errflow
 
 environment:
