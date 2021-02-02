@@ -96,8 +96,13 @@ class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
 
     _lastError = error;
 
-    if (exception != null) {
-      log(exception, stack, context);
+    for (final listener in _listeners!) {
+      listener(
+        error: error,
+        exception: exception,
+        stack: stack,
+        context: context,
+      );
     }
   }
 
