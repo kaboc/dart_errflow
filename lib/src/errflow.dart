@@ -214,8 +214,10 @@ class ErrFlow<T> {
   /// [LoggingErrNotifier] passed to it.
   ///
   /// The object can be used to call [LoggingErrNotifier.set()] and
-  /// [LoggingErrNotifier.log()], but calls to [LoggingErrNotifier.set()]
-  /// are forwarded to the logger.
+  /// [LoggingErrNotifier.log()], but unlike [ErrNotifier.set()],
+  /// [LoggingErrNotifier.set()] does not trigger the error handlers,
+  /// It only updates the value of [lastError], and triggers the logger
+  /// and added listener functions.
   ///
   /// This is useful when you want the errors set by `set()` inside [process]
   /// to be only logged without being handled by the error handlers.
@@ -235,8 +237,10 @@ class ErrFlow<T> {
   /// Executes the provided function [process] with an object of
   /// [IgnorableErrNotifier] passed to it.
   ///
-  /// All calls on the object to [IgnorableErrNotifier.set()] and
-  /// [IgnorableErrNotifier.log()] are ignored.
+  /// [IgnorableErrNotifier.set()] and [IgnorableErrNotifier.log()] do not
+  /// trigger the error handlers, the logger, nor added listener functions.
+  /// Note, however, that [IgnorableErrNotifier.set()] updates the value
+  /// of [lastError].
   ///
   /// This is useful when you want to prevent the error handlers and
   /// the logger from being triggered even if `set()` and `log()` are

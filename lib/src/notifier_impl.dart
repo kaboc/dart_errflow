@@ -95,7 +95,15 @@ class LoggingNotifier<T> with _State<T> implements LoggingErrNotifier<T> {
     assert(error != null);
 
     _lastError = error;
-    log(exception, stack, context);
+
+    for (final listener in _listeners) {
+      listener(
+        error: error,
+        exception: exception,
+        stack: stack,
+        context: context,
+      );
+    }
   }
 
   @override

@@ -87,13 +87,13 @@ void main() {
       expect(notifier.lastError, equals(10));
     });
 
-    test('a call to set() is forwarded to log()', () {
+    test('set() calls listener functions', () {
       final notification = _Notification();
       loggingNotifier
         ..addListener(notification.listener)
         ..set(1, 'foo', _StackTrace('bar'), 'baz');
 
-      expect(notification.errors, equals(<int>[]));
+      expect(notification.errors, equals(<int>[1]));
       expect(notification.exceptions, equals(['foo']));
       expect(notification.stacks, equals(['bar']));
       expect(notification.contexts, equals(['baz']));
