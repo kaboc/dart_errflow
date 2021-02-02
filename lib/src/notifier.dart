@@ -34,26 +34,19 @@ abstract class ErrNotifier<T> {
   void log(Object exception, [StackTrace? stack, Object? context]);
 }
 
-/// A variant of [ErrNotifier] that forwards calls to the [set()] method
-/// to [log()].
+/// A variant of [ErrNotifier] used in [ErrFlow.loggingScope()].
+/// This notifier itself is the same as [ErrNotifier], but because
+/// [ErrFlow.loggingScope()] has no parameters for error conditions,
+/// calling [set()] does not trigger the error handlers.
 @sealed
-abstract class LoggingErrNotifier<T> extends ErrNotifier<T> {
-  /// Updates [lastError], and then calls [log()] instead of calling one of
-  /// the error handlers.
-  ///
-  /// `exception` must not be null.
-  @override
-  void set(T error, [Object? exception, StackTrace? stack, Object? context]);
+abstract class LoggingErrNotifier<T> extends ErrNotifier<T> {}
 
-  @override
-  void log(Object exception, [StackTrace? stack, Object? context]);
-}
-
-/// A variant of [ErrNotifier] that does not have listeners and ignores calls
-/// to [set()] and [log()].
+/// A variant of [ErrNotifier] used in [ErrFlow.ignorableScope()].
+/// Calling [set()] and [log()].with this notifier does not trigger
+/// the error handlers, the logger, nor added listener functions.
 @sealed
 abstract class IgnorableErrNotifier<T> extends ErrNotifier<T> {
-  /// Only updates [lastError].
+  /// Only sets [error] to [lastError].
   @override
   void set(T error, [Object? exception, StackTrace? stack, Object? context]);
 

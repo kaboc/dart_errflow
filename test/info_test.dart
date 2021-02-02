@@ -10,12 +10,12 @@ void main() {
       expect(notifier.lastError, equals(10));
     });
 
-    test('calling set() updates last error', () {
+    test('set() updates last error', () {
       notifier.set(1);
       expect(notifier.lastError, equals(1));
     });
 
-    test('calling set() notifies listeners', () {
+    test('set() calls listener functions', () {
       final notification = _Notification();
       notifier
         ..addListener(notification.listener)
@@ -27,7 +27,7 @@ void main() {
       expect(notification.contexts, equals(['baz']));
     });
 
-    test('calling log() notifies listeners', () {
+    test('log() calls listener functions', () {
       final notification = _Notification();
       notifier
         ..addListener(notification.listener)
@@ -70,12 +70,12 @@ void main() {
     final notifier = Notifier<int>(10);
     final loggingNotifier = LoggingNotifier<int>.from(notifier);
 
-    test('calling set() updates last error', () {
+    test('set() updates last error', () {
       loggingNotifier.set(1);
       expect(loggingNotifier.lastError, equals(1));
     });
 
-    test('calling set() does not update last error in original object', () {
+    test('set() does not update last error in original object', () {
       loggingNotifier.set(1);
       expect(notifier.lastError, equals(10));
     });
@@ -92,7 +92,7 @@ void main() {
       expect(notification.contexts, equals(['baz']));
     });
 
-    test('calling log() notifies listeners', () {
+    test('log() calls listener functions', () {
       final notification = _Notification();
       loggingNotifier
         ..addListener(notification.listener)
@@ -124,12 +124,12 @@ void main() {
       );
     });
 
-    test('calling set() updates last error', () {
+    test('set() updates last error', () {
       ignorableNotifier.set(1);
       expect(ignorableNotifier.lastError, equals(1));
     });
 
-    test('calling set() does not update last error in original object', () {
+    test('set() does not update last error in original object', () {
       ignorableNotifier.set(1);
       expect(notifier.lastError, equals(10));
     });

@@ -302,7 +302,7 @@ void main() {
       });
     });
 
-    test('calling set() calls the logger', () {
+    test('set() calls the logger', () {
       final log = _Log();
       errFlow.logger = log.logger;
 
@@ -324,6 +324,20 @@ void main() {
         );
       });
     });
+
+    test(
+      'assert() fails on set() with stack/context but without exception',
+      () {
+        errFlow.useDefaultLogger();
+
+        errFlow.scope<void>((notifier) async {
+          expect(
+            () => notifier.set(200, null, _StackTrace('bar'), 'baz'),
+            throwsA(isA<AssertionError>()),
+          );
+        });
+      },
+    );
   });
 
   group('loggingScope() and ignorableScope()', () {
@@ -381,11 +395,13 @@ void main() {
     errFlow2.dispose();
 
     test('cannot be used after disposed', () {
-      final listener = (
-          {int? error,
-          Object? exception,
-          StackTrace? stack,
-          Object? context}) {};
+      final listener = ({
+        int? error,
+        Object? exception,
+        StackTrace? stack,
+        Object? context,
+      }) {};
+
       expect(
         () => errFlow2.addListener(listener),
         throwsA(isA<AssertionError>()),

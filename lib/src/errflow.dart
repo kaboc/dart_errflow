@@ -216,9 +216,8 @@ class ErrFlow<T> {
   /// [LoggingErrNotifier.log()], but calls to [LoggingErrNotifier.set()]
   /// are forwarded to the logger.
   ///
-  /// This is useful when you want errors set by [LoggingErrNotifier.set()]
-  /// in [process] to be only logged instead of handled by the error
-  /// handlers.
+  /// This is useful when you want the errors set by `set()` inside [process]
+  /// to be only logged without being handled by the error handlers.
   Future<S> loggingScope<S>(
     Future<S> Function(LoggingErrNotifier<T>) process,
   ) async {
@@ -238,8 +237,8 @@ class ErrFlow<T> {
   /// [IgnorableErrNotifier.log()] are ignored.
   ///
   /// This is useful when you want to prevent the error handlers and
-  /// the logger from being triggered even if [IgnorableErrNotifier.set()]
-  /// and [IgnorableErrNotifier.log()] are called inside [process].
+  /// the logger from being triggered even if `set()` and `log()` are
+  /// called inside [process].
   Future<S> ignorableScope<S>(
     Future<S> Function(IgnorableErrNotifier<T>) process,
   ) async {
