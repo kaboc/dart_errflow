@@ -25,7 +25,7 @@ Future<void> main() async {
   errFlow.dispose();
 }
 
-Future<void> logger(Object? e, StackTrace? s, {Object? reason}) async {
+void logger(Object? e, StackTrace? s, {Object? reason}) {
   print('Logged: $e');
 }
 

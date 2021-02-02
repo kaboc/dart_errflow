@@ -298,6 +298,34 @@ void main() {
       });
     });
 
+    test('logger can return Future but is not awaited', () async {
+      final log = _Log();
+      errFlow.logger = log.loggerWith100msDelay;
+
+      errFlow.scope<void>((notifier) {
+        notifier.log('foo', _StackTrace('bar'), 'baz');
+
+        bool error;
+        try {
+          print(log.exception);
+          error = false;
+          // ignore: avoid_catching_errors
+        } on LateInitializationError catch (_) {
+          error = true;
+        }
+
+        expect(error, isTrue);
+        expect(log.stack, isNull);
+        expect(log.reason, isNull);
+      });
+
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+
+      expect(log.exception, equals('foo'));
+      expect(log.stack.toString(), equals('bar'));
+      expect(log.reason, equals('baz'));
+    });
+
     test('logger is called with correct values when context is omitted', () {
       final log = _Log();
       errFlow.logger = log.logger;
@@ -438,7 +466,7 @@ void main() {
         try {
           print(log.exception);
           error = false;
-        // ignore: avoid_catching_errors
+          // ignore: avoid_catching_errors
         } on LateInitializationError catch (_) {
           error = true;
         }
@@ -482,10 +510,23 @@ class _Log {
   StackTrace? stack;
   Object? reason;
 
-  Future<void> logger(Object e, StackTrace? s, {Object? reason}) async {
+  void logger(Object e, StackTrace? s, {Object? reason}) {
     exception = e;
     stack = s;
     this.reason = reason;
+  }
+
+  Future<void> loggerWith100msDelay(
+    Object e,
+    StackTrace? s, {
+    Object? reason,
+  }) async {
+    await (() async {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      exception = e;
+      stack = s;
+      this.reason = reason;
+    })();
   }
 }
 
