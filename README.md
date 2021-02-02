@@ -235,7 +235,9 @@ errFlow.useDefaultLogger();
 If it lacks functionality you need, set your own logger.
 
 ```dart
-Future<void> _logger(dynamic e, StackTrace s, {dynamic reason}) async {
+// The return type can be Future or non-Future.
+// Note: Even if a Future is returned, set() and log() won't await it.
+void _logger(dynamic e, StackTrace s, {dynamic reason}) {
   // Logging operations
 }
 

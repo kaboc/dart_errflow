@@ -305,6 +305,24 @@ void main() {
       });
     });
 
+    test('logger can return Future but is not awaited', () async {
+      final log = _Log();
+      errFlow.logger = log.loggerWith100msDelay;
+
+      errFlow.scope<void>((notifier) {
+        notifier.log('foo', _StackTrace('bar'), 'baz');
+        expect(log.exception, isNull);
+        expect(log.stack, isNull);
+        expect(log.reason, isNull);
+      });
+
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+
+      expect(log.exception, equals('foo'));
+      expect(log.stack.toString(), equals('bar'));
+      expect(log.reason, equals('baz'));
+    });
+
     test('logger is called with correct values when context is omitted', () {
       final log = _Log();
       errFlow.logger = log.logger;
@@ -481,10 +499,23 @@ class _Log {
   StackTrace stack;
   dynamic reason;
 
-  Future<void> logger(dynamic e, StackTrace s, {dynamic reason}) async {
+  void logger(dynamic e, StackTrace s, {dynamic reason}) {
     exception = e;
     stack = s;
     this.reason = reason;
+  }
+
+  Future<void> loggerWith100msDelay(
+    dynamic e,
+    StackTrace s, {
+    dynamic reason,
+  }) async {
+    await (() async {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      exception = e;
+      stack = s;
+      this.reason = reason;
+    })();
   }
 }
 

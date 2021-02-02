@@ -25,7 +25,7 @@ Future<void> main() async {
   errFlow.dispose();
 }
 
-Future<void> logger(dynamic e, StackTrace s, {dynamic reason}) async {
+void logger(dynamic e, StackTrace s, {dynamic reason}) {
   print('Logged: $e');
 }
 
