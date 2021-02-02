@@ -117,7 +117,7 @@ class ErrFlow<T> {
     logger = _defaultLogger;
   }
 
-  void _defaultLogger(Object? exception, StackTrace? stack, {Object? reason}) {
+  void _defaultLogger(Object exception, StackTrace? stack, {Object? reason}) {
     print(exception);
     if (stack != null) {
       print(stack);
