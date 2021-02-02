@@ -7,43 +7,43 @@ void main() {
     final notifier = Notifier<int>(10);
 
     test('default value is set as lastError', () {
-      expect(notifier.lastError, 10);
+      expect(notifier.lastError, equals(10));
     });
 
-    test('assert() fails if set() is called without error value', () {
+    test('assert() fails on set() without error value', () {
       expect(
         () => notifier.set(null),
         throwsA(isA<AssertionError>()),
       );
     });
 
-    test('calling set() updates last error', () {
+    test('set() updates last error', () {
       notifier.set(1);
-      expect(notifier.lastError, 1);
+      expect(notifier.lastError, equals(1));
     });
 
-    test('calling set() notifies listeners', () {
+    test('set() calls listener functions', () {
       final notification = _Notification();
       notifier
         ..addListener(notification.listener)
         ..set(1, 'foo', _StackTrace('bar'), 'baz');
 
-      expect(notification.errors, [1]);
-      expect(notification.exceptions, ['foo']);
-      expect(notification.stacks, ['bar']);
-      expect(notification.contexts, ['baz']);
+      expect(notification.errors, equals([1]));
+      expect(notification.exceptions, equals(['foo']));
+      expect(notification.stacks, equals(['bar']));
+      expect(notification.contexts, equals(['baz']));
     });
 
-    test('calling log() notifies listeners', () {
+    test('log() calls listener functions', () {
       final notification = _Notification();
       notifier
         ..addListener(notification.listener)
         ..log('foo', _StackTrace('bar'), 'baz');
 
-      expect(notification.errors, <int>[]);
-      expect(notification.exceptions, ['foo']);
-      expect(notification.stacks, ['bar']);
-      expect(notification.contexts, ['baz']);
+      expect(notification.errors, equals(<int>[]));
+      expect(notification.exceptions, equals(['foo']));
+      expect(notification.stacks, equals(['bar']));
+      expect(notification.contexts, equals(['baz']));
     });
 
     test('only remaining listeners are notified', () {
@@ -60,16 +60,16 @@ void main() {
         ..removeListener(notification2.listener)
         ..set(4);
 
-      expect(notification1.errors, <int>[1, 2]);
-      expect(notification2.errors, <int>[2, 3]);
+      expect(notification1.errors, equals(<int>[1, 2]));
+      expect(notification2.errors, equals(<int>[2, 3]));
     });
 
     test('hasError returns an appropriate value', () {
       final newNotifier = Notifier<int>(10);
-      expect(newNotifier.hasError, false);
+      expect(newNotifier.hasError, isFalse);
 
       newNotifier.set(1);
-      expect(newNotifier.hasError, true);
+      expect(newNotifier.hasError, isTrue);
     });
   });
 
@@ -77,14 +77,14 @@ void main() {
     final notifier = Notifier<int>(10);
     final loggingNotifier = LoggingNotifier<int>.from(notifier);
 
-    test('calling set() updates last error', () {
+    test('set() updates last error', () {
       loggingNotifier.set(1);
-      expect(loggingNotifier.lastError, 1);
+      expect(loggingNotifier.lastError, equals(1));
     });
 
-    test('calling set() does not update last error in original object', () {
+    test('set() does not update last error in original object', () {
       loggingNotifier.set(1);
-      expect(notifier.lastError, 10);
+      expect(notifier.lastError, equals(10));
     });
 
     test('a call to set() is forwarded to log()', () {
@@ -93,30 +93,30 @@ void main() {
         ..addListener(notification.listener)
         ..set(1, 'foo', _StackTrace('bar'), 'baz');
 
-      expect(notification.errors, <int>[]);
-      expect(notification.exceptions, ['foo']);
-      expect(notification.stacks, ['bar']);
-      expect(notification.contexts, ['baz']);
+      expect(notification.errors, equals(<int>[]));
+      expect(notification.exceptions, equals(['foo']));
+      expect(notification.stacks, equals(['bar']));
+      expect(notification.contexts, equals(['baz']));
     });
 
-    test('calling log() notifies listeners', () {
+    test('log() calls listener functions', () {
       final notification = _Notification();
       loggingNotifier
         ..addListener(notification.listener)
         ..log('foo', _StackTrace('bar'), 'baz');
 
-      expect(notification.errors, <int>[]);
-      expect(notification.exceptions, ['foo']);
-      expect(notification.stacks, ['bar']);
-      expect(notification.contexts, ['baz']);
+      expect(notification.errors, equals(<int>[]));
+      expect(notification.exceptions, equals(['foo']));
+      expect(notification.stacks, equals(['bar']));
+      expect(notification.contexts, equals(['baz']));
     });
 
     test('hasError returns an appropriate value', () {
       final newLoggingNotifier = LoggingNotifier<int>.from(notifier);
-      expect(newLoggingNotifier.hasError, false);
+      expect(newLoggingNotifier.hasError, isFalse);
 
       newLoggingNotifier.set(1);
-      expect(newLoggingNotifier.hasError, true);
+      expect(newLoggingNotifier.hasError, isTrue);
     });
   });
 
@@ -131,22 +131,22 @@ void main() {
       );
     });
 
-    test('calling set() updates last error', () {
+    test('set() updates last error', () {
       ignorableNotifier.set(1);
-      expect(ignorableNotifier.lastError, 1);
+      expect(ignorableNotifier.lastError, equals(1));
     });
 
-    test('calling set() does not update last error in original object', () {
+    test('set() does not update last error in original object', () {
       ignorableNotifier.set(1);
-      expect(notifier.lastError, 10);
+      expect(notifier.lastError, equals(10));
     });
 
     test('hasError returns an appropriate value', () {
       final newIgnorableNotifier = IgnorableNotifier<int>.from(notifier);
-      expect(newIgnorableNotifier.hasError, false);
+      expect(newIgnorableNotifier.hasError, isFalse);
 
       newIgnorableNotifier.set(1);
-      expect(newIgnorableNotifier.hasError, true);
+      expect(newIgnorableNotifier.hasError, isTrue);
     });
   });
 
@@ -160,7 +160,7 @@ void main() {
       ..dispose();
 
     test('cannot be used after disposed', () {
-      expect(notification.errors, <int>[1]);
+      expect(notification.errors, equals(<int>[1]));
       expect(() => notifier.set(2), throwsA(isA<AssertionError>()));
     });
 

@@ -14,6 +14,37 @@ The package should be safer now in exchange for the inconvenience caused by them
 
 ---
 
+## Motivation
+
+I made this package because I found it hard to handle exceptions:
+
+- An app stops on an exception if it is not caught.
+- It is sometimes unclear if an exception has already been caught somewhere.
+- It is not preferable to catch an exception in a different layer that should be agnostic
+  about a specific exception (e.g. a DB error / a network error).
+- However, it is difficult to return an error value (instead of the exception itself to
+  avoid the above issue) together with the result of some processing from a method to its
+  caller located in another layer.
+
+Solutions:
+
+- [Result][result] in `package:async`
+- `package:errflow` (this package)
+
+These look very different, but roughly speaking, they are similar in that they provide
+a way to pass both result and error values together from a method to the caller.
+The former returns an object of the `Result` class that can hold either of those values,
+and the latter uses a notifier passed from a caller to notify such values to the caller.
+
+A big difference is that this package also provides handlers and a logger to enable errors
+to be handled more easily in a unified manner.
+
+***Isn't it inconvenient to have to pass a notifier?***
+
+It is probably possible to remove the hassle to have to pass over an object of
+[ErrNotifier][notifier], but I choose not to do so because method signatures with a
+parameter of type `ErrNotifier` helps you spot which methods require error handling.
+
 ## Usage
 
 ### Initialisation and clean-up
@@ -51,9 +82,9 @@ errFlow.dispose();
    if it is provided via [set()][set] or [log()][log].
 
 ```dart
-Future<bool> yourMethod(ErrNotifier notifier) {
+Future<bool> yourMethod(ErrNotifier notifier) async {
   try {
-    return errorProneProcess();
+    return await errorProneProcess();
   } catch(e, s) {
     // This updates the last error value and also triggers logging.
     notifier.set(ErrorTypes.foo, e, s, 'additional info');
@@ -66,7 +97,7 @@ Future<bool> yourMethod(ErrNotifier notifier) {
     notifier.log(e, s, 'additional info');
   }
 
-  // You can use hasError to check if some error was set. 
+  // You can use hasError to check if some error was set.
   if (notifier.hasError) {
     ...
   }
@@ -74,22 +105,6 @@ Future<bool> yourMethod(ErrNotifier notifier) {
   return false;
 }
 ```
-
-Exceptions are cumbersome to handle:
-
-- The app stops on an exception if it is not caught.
-- It is sometimes unclear if try-catch has already been used somewhere else.
-- It is difficult to return both the result and the error value from a method.
-    - Another option is to use the [Result][result] class in package:async, but it does not
-      seem sufficient.
-- etc.
-
-So, catch each exception as soon as possible wherever it can occur, and convert it to your
-own custom error value for easier handling than to use the exception itself.
-
-The fact that you need an object of [ErrNotifier][notifier] may seem like a bother, but
-a method signature with/without a parameter of type [ErrNotifier][notifier] should help
-you spot whether the method requires error handling.
 
 ### Handling errors
 
@@ -130,34 +145,51 @@ errorIf: (result, error) => !result && error != ErrorTypes.connection
 
 ### Ignoring errors
 
-If a method, in which [set()][set] is called on an exception, is called from some different
-places in your code, you may want to show an error message at some of them but not at the others.
-In such a case, you can control whether to handle the error, only log it instead of handling
-it, or ignore it completely.
+If a method, in which [set()][set] can be used, is called from some different places in
+your code, you may want to show an error message at some of them but not at the others.
+It is possible with the use of [loggingScope][logging-scope] and [ignorableScope][ignorable-scope],
+allowing you to only log errors without handling them, or ignore them completely.
 
 *loggingScope()*
 
 `notifier` passed from [loggingScope][logging-scope] is an object of
- [LoggingErrNotifier][logging-notifier]. Calls on that object to [set()][logging-set] are
-forwarded to [log()][logging-log], meaning that the error handlers are not triggered.
+[LoggingErrNotifier][logging-notifier]. Calling [set()][logging-set] on that object only
+updates the value of [lastError][lasterror] and triggers the logger (and added listener
+functions), without triggering the error handlers.
 
 ```dart
-await errFlow.loggingScope<bool>(
-  (notifier) => yourMethod(notifier),
+final result = await errFlow.loggingScope<bool>(
+  (LoggingErrNotifier notifier) => yourMethod(notifier),
 );
+
+Future<bool> yourMethod(ErrNotifier notifier) async {
+  try {
+    return ...;
+  } catch(e, s) {
+    notifier.set(ErrorTypes.foo, e, s);  // Only updates lastError and logs the error.
+  }
+}
 ```
 
 *ignorableScope()*
 
 `notifier` passed from [ignorableScope][ignorable-scope] is an object of
-[IgnorableErrNotifier][ignorable-notifier]. Calls on that object to [set()][ignorable-set]
-and [log()][ignorable-log] are ignored, meaning that both the error handlers and the logger
-are not triggered.
+[IgnorableErrNotifier][ignorable-notifier]. Calling [set()][ignorable-set] and
+[log()][ignorable-log] on that object does not trigger the error handlers nor the logger.
+[set()][ignorable-set] only updates the value of [lastError][lasterror].
 
 ```dart
-await errFlow.ignorableScope<bool>(
-  (notifier) => yourMethod(notifier),
+final result = await errFlow.ignorableScope<bool>(
+  (IgnorableErrNotifier notifier) => yourMethod(notifier),
 );
+
+Future<bool> yourMethod(ErrNotifier notifier) async {
+  try {
+    return ...;
+  } catch(e, s) {
+    notifier.set(ErrorTypes.foo, e, s);  // Only updates lastError.
+  }
+}
 ```
 
 ### Default error handlers
@@ -212,7 +244,19 @@ Future<void> _logger(dynamic e, StackTrace s, {dynamic reason}) async {
 errFlow.logger = _logger;
 ```
 
-Set the default or a custom logger, otherwise an assertion error will occur in the debug mode.
+In flutter, the `recordError()` method of the firebase_crashlytics package can be assigned
+to the logger as is.
+
+```dart
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
+...
+
+errFlow.logger = FirebaseCrashlytics.recordError;
+```
+
+Make sure to set the default or a custom logger, otherwise an assertion error will occur
+in the debug mode.
 
 ### Adding/removing a listener
 
