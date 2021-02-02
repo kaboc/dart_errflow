@@ -162,7 +162,7 @@ final result = await errFlow.loggingScope<bool>(
   (LoggingErrNotifier notifier) => yourMethod(notifier),
 );
 
-Future<bool> yourMethod(ErrNotifier notifier) async {
+bool yourMethod(ErrNotifier notifier) {
   try {
     return ...;
   } catch(e, s) {
@@ -183,7 +183,7 @@ final result = await errFlow.ignorableScope<bool>(
   (IgnorableErrNotifier notifier) => yourMethod(notifier),
 );
 
-Future<bool> yourMethod(ErrNotifier notifier) async {
+bool yourMethod(ErrNotifier notifier) {
   try {
     return ...;
   } catch(e, s) {

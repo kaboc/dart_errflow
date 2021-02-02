@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:meta/meta.dart';
 
 import 'notifier_impl.dart';
@@ -167,7 +168,7 @@ class ErrFlow<T> {
   /// The condition of [criticalIf] is evaluated prior to that of [errorIf],
   /// and the latter is ignored if the former condition is met.
   Future<S> scope<S>(
-    Future<S> Function(ErrNotifier<T>) process, {
+    FutureOr<S> Function(ErrNotifier<T>) process, {
     bool Function(S, T) errorIf,
     bool Function(S, T) criticalIf,
     void Function(S, T) onError,
@@ -222,7 +223,7 @@ class ErrFlow<T> {
   /// This is useful when you want the errors set by `set()` inside [process]
   /// to be only logged without being handled by the error handlers.
   Future<S> loggingScope<S>(
-    Future<S> Function(LoggingErrNotifier<T>) process,
+    FutureOr<S> Function(LoggingErrNotifier<T>) process,
   ) async {
     assert(_debugAssertNotDisposed());
     assert(process != null);
@@ -246,7 +247,7 @@ class ErrFlow<T> {
   /// the logger from being triggered even if `set()` and `log()` are
   /// called inside [process].
   Future<S> ignorableScope<S>(
-    Future<S> Function(IgnorableErrNotifier<T>) process,
+    FutureOr<S> Function(IgnorableErrNotifier<T>) process,
   ) async {
     assert(_debugAssertNotDisposed());
     assert(process != null);
