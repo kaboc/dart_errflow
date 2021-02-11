@@ -1,3 +1,8 @@
+## 0.4.0-nullsafety.2 - 11 February 2021
+
+* Allow the default error value to be null.
+* Minor improvements of documentation, tests, etc.
+
 ## 0.4.0-nullsafety.1 - 2 February 2021
 
 * Fix the issue of `Loggingnotifier.set()` not passing the provided error to listeners.
