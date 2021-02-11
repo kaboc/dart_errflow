@@ -38,7 +38,7 @@ mixin _State<T> {
 }
 
 class Notifier<T> with _State<T> implements ErrNotifier<T> {
-  Notifier(T defaultValue, {Set<ErrListener<T>>? listeners}) {
+  Notifier(T? defaultValue, {Set<ErrListener<T>>? listeners}) {
     _defaultValue = defaultValue;
     _listeners = listeners ?? {};
     _lastError = defaultValue;

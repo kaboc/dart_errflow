@@ -29,7 +29,7 @@ void logger(Object e, StackTrace? s, {Object? reason}) {
   print('Logged: $e');
 }
 
-void errorHandler<T>(T result, ErrorTypes error) {
+void errorHandler<T>(T result, ErrorTypes? error) {
   print('Error: $error');
 }
 

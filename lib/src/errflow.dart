@@ -12,7 +12,7 @@ class ErrFlow<T> {
   /// The generic type [T] is the type of error values. The provided
   /// [defaultValue] is used as the initial value in notifiers,
   /// representing that there is no error initially in each [scope()].
-  ErrFlow(T defaultValue) {
+  ErrFlow([T? defaultValue]) {
     _notifier = Notifier<T>(defaultValue)
       ..addListener(
         ({T? error, Object? exception, StackTrace? stack, Object? context}) {
@@ -46,7 +46,7 @@ class ErrFlow<T> {
   ///
   /// The value returned from the function executed by [scope()] and the
   /// last error are passed in, which are of type `S` and [T] respectively.
-  void Function<S>(S, T)? errorHandler;
+  void Function<S>(S, T?)? errorHandler;
 
   /// The default error handler function for critical errors.
   ///
@@ -55,7 +55,7 @@ class ErrFlow<T> {
   ///
   /// The value returned from the function executed by [scope()] and the
   /// last error are passed in, which are of type `S` and [T] respectively.
-  void Function<S>(S, T)? criticalErrorHandler;
+  void Function<S>(S, T?)? criticalErrorHandler;
 
   /// A logger function that is called when an error is notified.
   ///
@@ -165,10 +165,10 @@ class ErrFlow<T> {
   /// and the latter is ignored if the former condition is met.
   Future<S> scope<S>(
     FutureOr<S> Function(ErrNotifier<T>) process, {
-    bool Function(S, T)? errorIf,
-    bool Function(S, T)? criticalIf,
-    void Function(S, T)? onError,
-    void Function(S, T)? onCriticalError,
+    bool Function(S, T?)? errorIf,
+    bool Function(S, T?)? criticalIf,
+    void Function(S, T?)? onError,
+    void Function(S, T?)? onCriticalError,
   }) async {
     assert(_debugAssertNotDisposed());
     assert(
@@ -190,7 +190,7 @@ class ErrFlow<T> {
 
     final newNotifier = Notifier.from(_notifier);
     final result = await process(newNotifier);
-    final error = newNotifier.lastError!;
+    final error = newNotifier.lastError;
 
     // NOTE: criticalIf must be evaluated ahead of errorIf.
     if (criticalIf != null && criticalIf(result, error)) {
