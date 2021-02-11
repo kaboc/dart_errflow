@@ -133,12 +133,12 @@ void main() {
           notifier.set(200);
           return 'foo';
         },
-        errorIf: (String result, int error) {
+        errorIf: (result, error) {
           expect(result, equals('foo'));
           expect(error, equals(200));
           return true;
         },
-        onError: (String result, int error) {
+        onError: (result, error) {
           expect(result, equals('foo'));
           expect(error, equals(200));
         },
@@ -195,12 +195,12 @@ void main() {
           notifier.set(200);
           return 'foo';
         },
-        criticalIf: (String result, int error) {
+        criticalIf: (result, error) {
           expect(result, equals('foo'));
           expect(error, equals(200));
           return true;
         },
-        onCriticalError: (String result, int error) {
+        onCriticalError: (result, error) {
           expect(result, equals('foo'));
           expect(error, equals(200));
         },
@@ -230,7 +230,7 @@ void main() {
 
       await errFlow.scope<bool>(
         (_) => true,
-        errorIf: (bool result, _) => result,
+        errorIf: (result, _) => result,
       );
 
       expect(r, isTrue);
@@ -261,7 +261,7 @@ void main() {
 
       await errFlow.scope<bool>(
         (_) => true,
-        criticalIf: (bool result, _) => result,
+        criticalIf: (result, _) => result,
       );
 
       expect(r, isTrue);

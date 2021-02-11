@@ -32,9 +32,8 @@ Solutions:
 - `package:errflow` (this package)
 
 These look very different, but roughly speaking, they are similar in that they provide
-a way to pass both result and error values together from a method to the caller.
-The former returns an object of the `Result` class that can hold either of those values,
-and the latter uses a notifier passed from a caller to notify such values to the caller.
+a way to pass a result and/or an error from a method to the caller; the former holds either
+of the values, and the latter enables the caller to evaluate both values.
 
 A big difference is that this package also provides handlers and a logger to enable errors
 to be handled more easily in a unified manner.
@@ -56,7 +55,7 @@ When the [ErrFlow][errflow] object is no longer needed, call [dispose()][dispose
 that the resources held in the object will not be used any more.
 
 ```dart
-enum ErrorTypes {
+enum CustomError {
   none,
   foo,
   bar,
@@ -64,7 +63,7 @@ enum ErrorTypes {
 
 ...
 
-final errFlow = ErrFlow<ErrorTypes>(ErrorTypes.none);
+final errFlow = ErrFlow<CustomError>(CustomError.none);
 
 ...
 
@@ -95,14 +94,7 @@ Future<bool> yourMethod(ErrNotifier notifier) async {
     return await errorProneProcess();
   } catch(e, s) {
     // This updates the last error value and also triggers logging.
-    notifier.set(ErrorTypes.foo, e, s, 'additional info');
-
-    // Provide only the error value if logging is unnecessary.
-    notifier.set(ErrorTypes.foo);
-
-    // Use log() instead, if you consider the exception as
-    // non-problematic and want to just log it.
-    notifier.log(e, s, 'additional info');
+    notifier.set(CustomError.foo, e, s, 'additional info');
   }
 
   // You can use hasError to check if some error was set.
@@ -112,6 +104,18 @@ Future<bool> yourMethod(ErrNotifier notifier) async {
 
   return false;
 }
+```
+
+You can also use only the first argument of [set()][set] to not trigger the logger:
+
+```dart
+notifier.set(CustomError.foo);
+```
+
+or use [log()][log] for only logging:
+
+```dart
+notifier.log(e, s, 'additional info');
 ```
 
 ### Handling errors
@@ -128,8 +132,8 @@ on the severity of the error.
 ```dart
 final result = await errFlow.scope<bool>(
   (notifier) => yourMethod(notifier),
-  errorIf: (result, error) => error == ErrorTypes.foo,
-  criticalIf: (result, error) => error == ErrorTypes.bar,
+  errorIf: (result, error) => error == CustomError.foo,
+  criticalIf: (result, error) => error == CustomError.bar,
   onError: (result, error) => _onError(result, error),
   onCriticalError: (result, error) => _onCriticalError(result, error),
 );
@@ -148,7 +152,7 @@ e.g. To trigger the `onError` handler when the process fails for reasons other t
 connection error:
 
 ```dart
-errorIf: (result, error) => !result && error != ErrorTypes.connection
+errorIf: (result, error) => !result && error != CustomError.connection
 ```
 
 ### Ignoring errors
@@ -174,7 +178,8 @@ bool yourMethod(ErrNotifier notifier) {
   try {
     return ...;
   } catch(e, s) {
-    notifier.set(ErrorTypes.foo, e, s);  // Only updates lastError and logs the error.
+    notifier.set(CustomError.foo, e, s);  // Only updates lastError and logs the error.
+    return false;
   }
 }
 ```
@@ -195,7 +200,8 @@ bool yourMethod(ErrNotifier notifier) {
   try {
     return ...;
   } catch(e, s) {
-    notifier.set(ErrorTypes.foo, e, s);  // Only updates lastError.
+    notifier.set(CustomError.foo, e, s);  // Only updates lastError.
+    return false;
   }
 }
 ```
@@ -208,9 +214,9 @@ come in handy. You can specify in advance how errors should be handled, and omit
 `onCriticalError` in [scope()][scope].
 
 ```dart
-void _errorHandler<T>(T result, ErrorTypes error) {
+void _errorHandler<T>(T result, CustomError error) {
   switch (error) {
-    case ErrorTypes.foo:
+    case CustomError.foo:
       // Handle the foo error (e.g. showing the error details)
       break;
     default:
@@ -273,7 +279,7 @@ in the debug mode.
 This is usually unnecessary, but you can add a custom listener for your special needs.
 
 ```dart
-void _listener({ErrorTypes error, dynamic exception, StackTrace stack, dynamic context}) {
+void _listener({CustomError error, dynamic exception, StackTrace stack, dynamic context}) {
   // Some processing
 }
 
