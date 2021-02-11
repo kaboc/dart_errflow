@@ -19,6 +19,13 @@ void main() {
       });
     });
 
+    test('defaultValue can be null', () {
+      final errFlow2 = ErrFlow<int>(null);
+      errFlow.scope<void>((notifier) {
+        expect(errFlow2.defaultValue, isNull);
+      });
+    });
+
     test('defaultValue does not change even if set() is called', () {
       errFlow.scope<void>((notifier) {
         notifier.set(200);
@@ -26,13 +33,22 @@ void main() {
       });
     });
 
-    test('notifier in scope() has the default value', () async {
+    test('notifier has the default value', () async {
       await errFlow.scope<void>((notifier) {
         notifier.set(200);
       });
 
       errFlow.scope<void>((notifier) {
         expect(notifier.lastError, equals(100));
+      });
+
+      final errFlow2 = ErrFlow<int>(null);
+      await errFlow2.scope<void>((notifier) {
+        notifier.set(200);
+      });
+
+      errFlow2.scope<void>((notifier) {
+        expect(notifier.lastError, isNull);
       });
     });
 
@@ -60,6 +76,13 @@ void main() {
 
     test('hasError returns an appropriate value', () {
       errFlow.scope<void>((notifier) {
+        expect(notifier.hasError, isFalse);
+        notifier.set(200);
+        expect(notifier.hasError, isTrue);
+      });
+
+      final errFlow2 = ErrFlow<int>();
+      errFlow2.scope<void>((notifier) {
         expect(notifier.hasError, isFalse);
         notifier.set(200);
         expect(notifier.hasError, isTrue);

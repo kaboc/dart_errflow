@@ -71,6 +71,14 @@ final errFlow = ErrFlow<ErrorTypes>(ErrorTypes.none);
 errFlow.dispose();
 ```
 
+If you prefer using `Exception` and its subtypes instead of a custom error type, specify
+`Exception` as the error type, and pass `null` or none to the constructor to use `null`
+as the default value.
+
+```dart
+final errFlow = ErrFlow<Exception>();
+```
+
 ### Setting/logging an error
 
 1. Call [set()][set] on an [ErrNotifier][notifier] object when some exception happens.

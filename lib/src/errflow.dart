@@ -12,7 +12,7 @@ class ErrFlow<T> {
   /// The generic type [T] is the type of error values. The provided
   /// [defaultValue] is used as the initial value in notifiers,
   /// representing that there is no error initially in each [scope()].
-  ErrFlow(T defaultValue) {
+  ErrFlow([T defaultValue]) {
     _notifier = Notifier<T>(defaultValue)
       ..addListener(
         ({T error, dynamic exception, StackTrace stack, dynamic context}) {
