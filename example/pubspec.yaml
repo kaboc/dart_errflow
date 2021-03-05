@@ -2,7 +2,7 @@ name: errflow_example
 description: An example of errflow.
 
 environment:
-  sdk: ">=2.12.0-29.10.beta <3.0.0"
+  sdk: ">=2.12.0-0 <3.0.0"
 
 dependencies:
   errflow:
