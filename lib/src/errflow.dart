@@ -12,10 +12,10 @@ class ErrFlow<T> {
   /// The generic type [T] is the type of error values. The provided
   /// [defaultValue] is used as the initial value in notifiers,
   /// representing that there is no error initially in each [scope()].
-  ErrFlow([T defaultValue]) {
+  ErrFlow([T? defaultValue]) {
     _notifier = Notifier<T>(defaultValue)
       ..addListener(
-        ({T error, dynamic exception, StackTrace stack, dynamic context}) {
+        ({T? error, Object? exception, StackTrace? stack, Object? context}) {
           assert(
             exception == null || logger != null,
             'Information on an exception was provided by `set()` or `log()` '
@@ -31,13 +31,13 @@ class ErrFlow<T> {
           );
 
           if (logger != null && exception != null) {
-            logger(exception, stack, reason: context);
+            logger!(exception, stack, reason: context);
           }
         },
       );
   }
 
-  Notifier<T> _notifier;
+  late final Notifier<T> _notifier;
 
   /// The default error handler function for non-critical errors.
   ///
@@ -46,7 +46,7 @@ class ErrFlow<T> {
   ///
   /// The value returned from the function executed by [scope()] and the
   /// last error are passed in, which are of type `S` and [T] respectively.
-  void Function<S>(S, T) errorHandler;
+  void Function<S>(S, T?)? errorHandler;
 
   /// The default error handler function for critical errors.
   ///
@@ -55,7 +55,7 @@ class ErrFlow<T> {
   ///
   /// The value returned from the function executed by [scope()] and the
   /// last error are passed in, which are of type `S` and [T] respectively.
-  void Function<S>(S, T) criticalErrorHandler;
+  void Function<S>(S, T?)? criticalErrorHandler;
 
   /// A logger function that is called when an error is notified.
   ///
@@ -64,16 +64,16 @@ class ErrFlow<T> {
   /// some named parameters existing in `recordError()`), and thus the
   /// `FirebaseCrashlytics.recordError` can be assigned to the logger as is
   /// if you want to leave logging operations to Crashlytics.
-  FutureOr<void> Function(dynamic, StackTrace, {dynamic reason}) logger;
+  FutureOr<void> Function(Object, StackTrace?, {Object? reason})? logger;
 
   /// A getter for the value that was set in the constructor and is used as
   /// the initial value for [lastError] in an object of the [ErrNotifier]
   /// class and its variants in each [scope()].
-  T get defaultValue => _notifier.defaultValue;
+  T? get defaultValue => _notifier.defaultValue;
 
   bool _debugAssertNotDisposed() {
     assert(() {
-      if (_notifier == null) {
+      if (_notifier.isDisposed) {
         throw AssertionError(
           'A $runtimeType was used after being disposed.\n'
           'Once you have called dispose() on a $runtimeType, '
@@ -89,7 +89,6 @@ class ErrFlow<T> {
   /// the object is not in a usable state and should be discarded.
   void dispose() {
     _notifier.dispose();
-    _notifier = null;
   }
 
   /// Registers a listener, which is a function to be called when new
@@ -118,7 +117,7 @@ class ErrFlow<T> {
     logger = _defaultLogger;
   }
 
-  void _defaultLogger(dynamic exception, StackTrace stack, {dynamic reason}) {
+  void _defaultLogger(Object exception, StackTrace? stack, {Object? reason}) {
     print(exception);
     if (stack != null) {
       print(stack);
@@ -130,17 +129,15 @@ class ErrFlow<T> {
 
   @override
   String toString() {
-    if (_notifier == null) {
-      return '$runtimeType#$hashCode';
-    }
-
+    final listenerCount =
+        _notifier.isDisposed ? 'null' : _notifier.countListeners();
     final hasErrorHandler = errorHandler != null;
     final hasCriticalErrorHandler = criticalErrorHandler != null;
     final hasLogger = logger != null;
     final loggerType = logger == _defaultLogger ? 'default' : 'custom';
 
     return '$runtimeType#$hashCode('
-        'listeners: ${_notifier.countListeners()}, '
+        'listeners: $listenerCount, '
         'defaultValue: ${_notifier.defaultValue}, '
         'errorHandler: ${hasErrorHandler ? 'set' : 'null'}, '
         'criticalErrorHandler: ${hasCriticalErrorHandler ? 'set' : 'null'}, '
@@ -168,13 +165,12 @@ class ErrFlow<T> {
   /// and the latter is ignored if the former condition is met.
   Future<S> scope<S>(
     FutureOr<S> Function(ErrNotifier<T>) process, {
-    bool Function(S, T) errorIf,
-    bool Function(S, T) criticalIf,
-    void Function(S, T) onError,
-    void Function(S, T) onCriticalError,
+    bool Function(S, T?)? errorIf,
+    bool Function(S, T?)? criticalIf,
+    void Function(S, T?)? onError,
+    void Function(S, T?)? onCriticalError,
   }) async {
     assert(_debugAssertNotDisposed());
-    assert(process != null);
     assert(
       errorIf == null || onError != null || errorHandler != null,
       'The handler for non-critical errors is missing while `errorIf` '
@@ -199,10 +195,10 @@ class ErrFlow<T> {
     // NOTE: criticalIf must be evaluated ahead of errorIf.
     if (criticalIf != null && criticalIf(result, error)) {
       onCriticalError == null
-          ? criticalErrorHandler(result, error)
+          ? criticalErrorHandler!(result, error)
           : onCriticalError(result, error);
     } else if (errorIf != null && errorIf(result, error)) {
-      onError == null ? errorHandler(result, error) : onError(result, error);
+      onError == null ? errorHandler!(result, error) : onError(result, error);
     }
 
     newNotifier.dispose();
@@ -225,7 +221,6 @@ class ErrFlow<T> {
     FutureOr<S> Function(LoggingErrNotifier<T>) process,
   ) async {
     assert(_debugAssertNotDisposed());
-    assert(process != null);
 
     final loggingNotifier = LoggingNotifier.from(_notifier);
     final result = await process(loggingNotifier);
@@ -249,7 +244,6 @@ class ErrFlow<T> {
     FutureOr<S> Function(IgnorableErrNotifier<T>) process,
   ) async {
     assert(_debugAssertNotDisposed());
-    assert(process != null);
 
     final ignorableNotifier = IgnorableNotifier.from(_notifier);
     final result = await process(ignorableNotifier);

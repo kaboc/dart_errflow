@@ -25,11 +25,11 @@ Future<void> main() async {
   errFlow.dispose();
 }
 
-void logger(dynamic e, StackTrace s, {dynamic reason}) {
+void logger(Object e, StackTrace? s, {Object? reason}) {
   print('Logged: $e');
 }
 
-void errorHandler<T>(T result, CustomError error) {
+void errorHandler<T>(T result, CustomError? error) {
   print('Error: $error');
 }
 

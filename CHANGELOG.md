@@ -1,13 +1,17 @@
-## 0.3.2 - 11 February 2021
-
+## 0.4.0-nullsafety.2 - 11 February 2021
 * Allow the default error value to be null.
 * Minor improvements of documentation, tests, etc.
 
-## 0.3.1 - 2 February 2021
+## 0.4.0-nullsafety.1 - 2 February 2021
 
 * Fix the issue of `Loggingnotifier.set()` not passing the provided error to listeners.
+* Fix the signatures of the default logger and some others to match `ErrFlow.logger`.
 * Change the return types of scopes and logger from `Future` to `FutureOr`.
 * Minor improvements of documentation, tests, etc.
+
+## 0.4.0-nullsafety.0 - 30 November 2020
+
+* Migrate to null safety.
 
 ## 0.3.0 - 25 September 2020
 

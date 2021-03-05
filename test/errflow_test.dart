@@ -6,13 +6,6 @@ void main() {
   final errFlow = ErrFlow<int>(100);
 
   group('function passed to scope()', () {
-    test('assert() fails if the function is null', () {
-      expect(
-        () => errFlow.scope<void>(null),
-        throwsA(isA<AssertionError>()),
-      );
-    });
-
     test('defaultValue has the default value set in constructor', () {
       errFlow.scope<void>((notifier) {
         expect(errFlow.defaultValue, equals(100));
@@ -287,8 +280,8 @@ void main() {
   group('concurrency', () {
     test('error in a scope does not affect another concurrent scope', () async {
       var i = 0;
-      final listener =
-          ({int error, dynamic exception, StackTrace stack, dynamic context}) {
+      final listener = (
+          {int? error, Object? exception, StackTrace? stack, Object? context}) {
         expect(error, equals(++i == 1 ? 200 : 300));
       };
       errFlow.addListener(listener);
@@ -334,7 +327,7 @@ void main() {
 
       errFlow.scope<void>((notifier) {
         notifier.log('foo', _StackTrace('bar'), 'baz');
-        expect(log.exception, isNull);
+        expect(() => log.exception, throwsA(isA<Error>()));
         expect(log.stack, isNull);
         expect(log.reason, isNull);
       });
@@ -382,20 +375,13 @@ void main() {
     });
 
     test(
-      'assert() fails on set()/log() with stack/context but without exception',
+      'assert() fails on set() with stack/context but without exception',
       () {
         errFlow.useDefaultLogger();
 
         errFlow.scope<void>((notifier) {
           expect(
             () => notifier.set(200, null, _StackTrace('bar'), 'baz'),
-            throwsA(isA<AssertionError>()),
-          );
-        });
-
-        errFlow.scope<void>((notifier) async {
-          expect(
-            () => notifier.log(null, _StackTrace('bar'), 'baz'),
             throwsA(isA<AssertionError>()),
           );
         });
@@ -488,7 +474,7 @@ void main() {
 
       errFlow.ignorableScope<void>((notifier) {
         notifier.log('foo', _StackTrace('bar'), 'baz');
-        expect(log.exception, isNull);
+        expect(() => log.exception, throwsA(isA<Error>()));
         expect(log.stack, isNull);
         expect(log.reason, isNull);
       });
@@ -500,8 +486,13 @@ void main() {
     errFlow2.dispose();
 
     test('cannot be used after disposed', () {
-      final listener =
-          ({int error, Object exception, StackTrace stack, Object context}) {};
+      final listener = ({
+        int? error,
+        Object? exception,
+        StackTrace? stack,
+        Object? context,
+      }) {};
+
       expect(
         () => errFlow2.addListener(listener),
         throwsA(isA<AssertionError>()),
@@ -518,20 +509,20 @@ void main() {
 }
 
 class _Log {
-  dynamic exception;
-  StackTrace stack;
-  dynamic reason;
+  late Object exception;
+  StackTrace? stack;
+  Object? reason;
 
-  void logger(dynamic e, StackTrace s, {dynamic reason}) {
+  void logger(Object e, StackTrace? s, {Object? reason}) {
     exception = e;
     stack = s;
     this.reason = reason;
   }
 
   Future<void> loggerWith100msDelay(
-    dynamic e,
-    StackTrace s, {
-    dynamic reason,
+    Object e,
+    StackTrace? s, {
+    Object? reason,
   }) async {
     await (() async {
       await Future<void>.delayed(const Duration(milliseconds: 100));

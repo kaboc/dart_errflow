@@ -214,7 +214,7 @@ come in handy. You can specify in advance how errors should be handled, and omit
 `onCriticalError` in [scope()][scope].
 
 ```dart
-void _errorHandler<T>(T result, CustomError error) {
+void _errorHandler<T>(T result, CustomError? error) {
   switch (error) {
     case CustomError.foo:
       // Handle the foo error (e.g. showing the error details)
@@ -251,7 +251,7 @@ If it lacks functionality you need, set your own logger.
 ```dart
 // The return type can be Future or non-Future.
 // Note: Even if a Future is returned, set() and log() won't await it.
-void _logger(dynamic e, StackTrace s, {dynamic reason}) {
+void _logger(Object e, StackTrace? s, {Object? reason}) {
   // Logging operations
 }
 
@@ -279,7 +279,7 @@ in the debug mode.
 This is usually unnecessary, but you can add a custom listener for your special needs.
 
 ```dart
-void _listener({CustomError error, dynamic exception, StackTrace stack, dynamic context}) {
+void _listener({CustomError? error, Object? exception, StackTrace? stack, Object? context}) {
   // Some processing
 }
 
