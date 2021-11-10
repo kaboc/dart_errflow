@@ -1,3 +1,10 @@
+## 0.4.1
+
+* Update dependencies.
+* Update CI workflow.
+* Improve documentation and example.
+* Disable directives_ordering.
+
 ## 0.4.0
 
 * Stable null safety release.
