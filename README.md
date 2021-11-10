@@ -1,18 +1,7 @@
-# errflow
-
 [![Pub Version](https://img.shields.io/pub/v/errflow)](https://pub.dev/packages/errflow)
 [![Dart CI](https://github.com/kaboc/dart_errflow/workflows/Dart%20CI/badge.svg)](https://github.com/kaboc/dart_errflow/actions)
 
-A Dart/Flutter package for making it somewhat easier to comprehend the flow of errors
-and handle them.
-
----
-
-**apologies for the breaking changes in v0.1.4.**  
-Please see the [Changelog](https://pub.dev/packages/errflow/changelog) for the list of the changes.  
-The package should be safer now in exchange for the inconvenience caused by them.
-
----
+A Dart package for easier and more comprehensible flow of error handling and logging.
 
 ## Motivation
 
@@ -21,7 +10,7 @@ I made this package because I found it hard to handle exceptions:
 - An app stops on an exception if it is not caught.
 - It is sometimes unclear if an exception has already been caught somewhere.
 - It is not preferable to catch an exception in a different layer that should be agnostic
-  about a specific exception (e.g. a DB error / a network error).
+  about things specific to the original layer (e.g. a DB error / a network error).
 - However, it is difficult to return an error value (instead of the exception itself to
   avoid the above issue) together with the result of some processing from a method to its
   caller located in another layer.
@@ -33,16 +22,10 @@ Solutions:
 
 These look very different, but roughly speaking, they are similar in that they provide
 a way to pass a result and/or an error from a method to the caller; the former holds either
-of the values, and the latter enables the caller to evaluate both values.
+of the values, and the latter allows the caller to evaluate both values.
 
 A big difference is that this package also provides handlers and a logger to enable errors
 to be handled more easily in a unified manner.
-
-***Isn't it inconvenient to have to pass a notifier?***
-
-It is probably possible to remove the hassle to have to pass over an object of
-[ErrNotifier][notifier], but I choose not to do so because method signatures with a
-parameter of type `ErrNotifier` helps you spot which methods require error handling.
 
 ## Usage
 
@@ -80,18 +63,24 @@ final errFlow = ErrFlow<Exception>();
 
 ### Setting/logging an error
 
-1. Call [set()][set] on an [ErrNotifier][notifier] object when some exception happens.
-    - The object is passed from [scope()][scope], which is described [later](#handling-errors)
-      in this document.
-2. The listener is notified of the error and stores it as the last error ([lastError][lasterror])
+1. Use `scope()` to pass an [ErrNotifier][notifier] to a function that can cause an error.
+2. Call [set()][set] on the notifier object when some exception happens in the function.
+3. The listener is notified of the error and stores it as the last error ([lastError][lasterror])
    so that it can be checked later inside the function executed by [scope()][scope].
-3. The listener also calls the [logger][logger] to log a set of information about the exception
+4. The listener also calls the [logger][logger] to log a set of information about the exception
    if it is provided via [set()][set] or [log()][log].
 
 ```dart
-Future<bool> yourMethod(ErrNotifier notifier) async {
+final result = await errFlow.scope<bool>(
+  (notifier) => yourFunc(notifier),
+  ...,
+);
+```
+
+```dart
+Future<bool> yourFunc(ErrNotifier notifier) async {
   try {
-    return await errorProneProcess();
+    await errorProneProcess();
   } catch(e, s) {
     // This updates the last error value and also triggers logging.
     notifier.set(CustomError.foo, e, s, 'additional info');
@@ -100,9 +89,10 @@ Future<bool> yourMethod(ErrNotifier notifier) async {
   // You can use hasError to check if some error was set.
   if (notifier.hasError) {
     ...
+    return false;
   }
 
-  return false;
+  return true;
 }
 ```
 
@@ -118,12 +108,19 @@ or use [log()][log] for only logging:
 notifier.log(e, s, 'additional info');
 ```
 
+***Isn't it inconvenient to have to pass a notifier?***
+
+It is not impossible to remove the hassle to have to pass over an object of
+[ErrNotifier][notifier], but I choose not to do so because method signatures with a
+parameter of type `ErrNotifier` help you spot which methods require error handling.
+
 ### Handling errors
 
-[scope()][scope] executes a function, and handles errors occurring inside there when the function
-finishes according to the conditions specified by `errorIf` and `criticalIf`. Use both or either
-of them to set the conditions of whether to treat the function result as a non-critical/critical
-error. The condition of `criticalIf` is evaluated prior to that of `errorIf`.
+[scope()][scope] executes a function, and handles errors that have occurred inside there at
+the point when the function finishes according to the conditions specified by `errorIf` and
+`criticalIf`. Use both or either of them to set the conditions of whether to treat the function
+result as a non-critical/critical error. The condition of `criticalIf` is evaluated prior to
+that of `errorIf`.
 
 If either of the conditions is met, the relevant handler, `onError` or `onCriticalError`, is
 called. Do some error handling in these handlers, like showing different messages depending
@@ -140,7 +137,7 @@ final result = await errFlow.scope<bool>(
 ```
 
 The handler functions receive the function result and the error value, which means you can
-combine them to customise the conditions for your preference.
+combine them to tweak the conditions for triggering the handlers.
 
 e.g. To trigger the `onError` handler if any error was set:
 
@@ -211,7 +208,7 @@ bool yourMethod(ErrNotifier notifier) {
 You may want to consistently use a particular handler for non-critical errors, and the same or
 another one for critical errors. In such a case, `errorHandler` and `criticalErrorHandler` will
 come in handy. You can specify in advance how errors should be handled, and omit `onError` and
-`onCriticalError` in [scope()][scope].
+`onCriticalError` in each [scope()][scope].
 
 ```dart
 void _errorHandler<T>(T result, CustomError? error) {

@@ -10,7 +10,8 @@ final errFlow = ErrFlow<CustomError>(CustomError.none);
 Future<void> main() async {
   errFlow
     ..logger = logger
-    ..criticalErrorHandler = errorHandler;
+    ..errorHandler = errorHandler // not used in this example
+    ..criticalErrorHandler = criticalErrorHandler;
 
   for (var i = -2; i <= 2; i++) {
     // Executes the dividedBy() method, and calls criticalErrorHandler
@@ -31,6 +32,10 @@ void logger(Object e, StackTrace? s, {Object? reason}) {
 
 void errorHandler<T>(T result, CustomError? error) {
   print('Error: $error');
+}
+
+void criticalErrorHandler<T>(T result, CustomError? error) {
+  print('Critical error: $error');
 }
 
 int dividedBy(ErrNotifier notifier, int v1, int v2) {

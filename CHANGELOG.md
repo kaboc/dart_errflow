@@ -2,29 +2,29 @@
 
 * Stable null safety release.
 
-## 0.4.0-nullsafety.2 - 11 February 2021
+## 0.4.0-nullsafety.2
 
 * Allow the default error value to be null.
 * Minor improvements of documentation, tests, etc.
 
-## 0.4.0-nullsafety.1 - 2 February 2021
+## 0.4.0-nullsafety.1
 
 * Fix the issue of `Loggingnotifier.set()` not passing the provided error to listeners.
 * Fix the signatures of the default logger and some others to match `ErrFlow.logger`.
 * Change the return types of scopes and logger from `Future` to `FutureOr`.
 * Minor improvements of documentation, tests, etc.
 
-## 0.4.0-nullsafety.0 - 30 November 2020
+## 0.4.0-nullsafety.0
 
 * Migrate to null safety.
 
-## 0.3.0 - 25 September 2020
+## 0.3.0
 
 * **BREAKING CHANGE**
-    * Change logger signature in accordance with new api of flutter_crashlytics package.
+    * Change logger signature in accordance with new api of firebase_crashlytics package.
 * Update documentation and dependencies.
 
-## 0.2.2 - 2 September 2020
+## 0.2.2
 
 * Internal changes
     * Rename `defaultError` to `defaultValue`.
@@ -36,16 +36,16 @@
     * Add `hasError` to `ErrNotifier`, `LoggingErrNotifier` and `IgnorableErrNotifier`.
 * Small improvements of documentation
 
-## 0.2.1 - 24 August 2020
+## 0.2.1
 
 * Fix inheritance relationship of IgnorableNotifier to be consistent with other classes.
 
-## 0.2.0 - 24 August 2020
+## 0.2.0
 
 * Correct version number.
     * Minor version number should have been incremented for the last breaking changes.
 
-## 0.1.4 - 20 August 2020
+## 0.1.4
 
 * **BREAKING CHANGES** to fix a serious flaw in concurrency.
     * Major API changes.
@@ -57,23 +57,23 @@
         * `lastError` is a property of `ErrNotifier`, not of `ErrFlow`.
         * `loggingScope()` and `ignorableScope()` are added.
     * File containing `ErrNotifier` cannot be imported separately.
-    * Update documentation, tests and example.
+* Update documentation, tests and example.
 
-## 0.1.3 - 3 August 2020
+## 0.1.3
 
 * Improve README.
 * Explain assertion errors.
 
-## 0.1.2 - 15 July 2020
+## 0.1.2
 
 * Enable omit_local_variable_types rule.
 * Minor updates of documentation.
 
-## 0.1.1 - 12 July 2020
+## 0.1.1
 
 * Minor updates of documentation.
 * Lower the `meta` version to avoid a dependency issue.
 
-## 0.1.0 - 12 July 2020
+## 0.1.0
 
 * Initial release

@@ -44,8 +44,8 @@ class ErrFlow<T> {
   /// If set, the function is used as the default handler that is called
   /// from [scope()] if `onError` is omitted.
   ///
-  /// The value returned from the function executed by [scope()] and the
-  /// last error are passed in, which are of type `S` and [T] respectively.
+  /// The result and error (if any) of the process done in [scope()] are
+  /// passed in, which are of type `S` and [T?] respectively.
   void Function<S>(S, T?)? errorHandler;
 
   /// The default error handler function for critical errors.
@@ -53,8 +53,8 @@ class ErrFlow<T> {
   /// If set, the function is used as the default handler that is called
   /// from [scope()] if `onCriticalError` is omitted.
   ///
-  /// The value returned from the function executed by [scope()] and the
-  /// last error are passed in, which are of type `S` and [T] respectively.
+  /// The result and error (if any) of the process done in [scope()] are
+  /// passed in, which are of type `S` and [T?] respectively.
   void Function<S>(S, T?)? criticalErrorHandler;
 
   /// A logger function that is called when an error is notified.
@@ -67,7 +67,7 @@ class ErrFlow<T> {
   FutureOr<void> Function(Object, StackTrace?, {Object? reason})? logger;
 
   /// A getter for the value that was set in the constructor and is used as
-  /// the initial value for [lastError] in an object of the [ErrNotifier]
+  /// the initial value for `lastError` in an object of the [ErrNotifier]
   /// class and its variants in each [scope()].
   T? get defaultValue => _notifier.defaultValue;
 
@@ -212,8 +212,8 @@ class ErrFlow<T> {
   /// The object can be used to call [LoggingErrNotifier.set()] and
   /// [LoggingErrNotifier.log()], but unlike [ErrNotifier.set()],
   /// [LoggingErrNotifier.set()] does not trigger the error handlers,
-  /// It only updates the value of [lastError], and triggers the logger
-  /// and added listener functions.
+  /// It only updates the value of [ErrNotifier.lastError], and triggers
+  /// the logger and added listener functions.
   ///
   /// This is useful when you want the errors set by `set()` inside [process]
   /// to be only logged without being handled by the error handlers.
@@ -235,7 +235,7 @@ class ErrFlow<T> {
   /// [IgnorableErrNotifier.set()] and [IgnorableErrNotifier.log()] do not
   /// trigger the error handlers, the logger, nor added listener functions.
   /// Note, however, that [IgnorableErrNotifier.set()] updates the value
-  /// of [lastError].
+  /// of [ErrNotifier.lastError].
   ///
   /// This is useful when you want to prevent the error handlers and
   /// the logger from being triggered even if `set()` and `log()` are
