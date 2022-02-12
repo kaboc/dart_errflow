@@ -117,13 +117,6 @@ void main() {
     final notifier = Notifier<int>(10);
     final ignorableNotifier = IgnorableNotifier<int>.from(notifier);
 
-    test('addListener() is unavailable', () {
-      expect(
-        () => ignorableNotifier.addListener(_Notification().listener),
-        throwsA(isA<AssertionError>()),
-      );
-    });
-
     test('set() updates last error', () {
       ignorableNotifier.set(1);
       expect(ignorableNotifier.lastError, equals(1));
@@ -132,6 +125,30 @@ void main() {
     test('set() does not update last error in original object', () {
       ignorableNotifier.set(1);
       expect(notifier.lastError, equals(10));
+    });
+
+    test('set() does not call listener functions', () {
+      final notification = _Notification();
+      ignorableNotifier
+        ..addListener(notification.listener)
+        ..set(1, 'foo', _StackTrace('bar'), 'baz');
+
+      expect(notification.errors, isEmpty);
+      expect(notification.exceptions, isEmpty);
+      expect(notification.stacks, isEmpty);
+      expect(notification.contexts, isEmpty);
+    });
+
+    test('log() does not call listener functions', () {
+      final notification = _Notification();
+      ignorableNotifier
+        ..addListener(notification.listener)
+        ..log('foo', _StackTrace('bar'), 'baz');
+
+      expect(notification.errors, isEmpty);
+      expect(notification.exceptions, isEmpty);
+      expect(notification.stacks, isEmpty);
+      expect(notification.contexts, isEmpty);
     });
 
     test('hasError returns an appropriate value', () {

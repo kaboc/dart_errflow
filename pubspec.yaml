@@ -4,7 +4,7 @@ version: 0.4.1
 repository: https://github.com/kaboc/dart_errflow
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.15.0 <3.0.0"
 
 dependencies:
   meta: ^1.7.0
