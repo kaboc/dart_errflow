@@ -33,7 +33,7 @@ void main() {
         ..addListener(notification.listener)
         ..log('foo', _StackTrace('bar'), 'baz');
 
-      expect(notification.errors, equals(<int>[]));
+      expect(notification.errors, isEmpty);
       expect(notification.exceptions, equals(['foo']));
       expect(notification.stacks, equals(['bar']));
       expect(notification.contexts, equals(['baz']));
@@ -53,8 +53,8 @@ void main() {
         ..removeListener(notification2.listener)
         ..set(4);
 
-      expect(notification1.errors, equals(<int>[1, 2]));
-      expect(notification2.errors, equals(<int>[2, 3]));
+      expect(notification1.errors, equals([1, 2]));
+      expect(notification2.errors, equals([2, 3]));
     });
 
     test('hasError returns an appropriate value', () {
@@ -86,7 +86,7 @@ void main() {
         ..addListener(notification.listener)
         ..set(1, 'foo', _StackTrace('bar'), 'baz');
 
-      expect(notification.errors, equals(<int>[1]));
+      expect(notification.errors, equals([1]));
       expect(notification.exceptions, equals(['foo']));
       expect(notification.stacks, equals(['bar']));
       expect(notification.contexts, equals(['baz']));
@@ -98,7 +98,7 @@ void main() {
         ..addListener(notification.listener)
         ..log('foo', _StackTrace('bar'), 'baz');
 
-      expect(notification.errors, equals(<int>[]));
+      expect(notification.errors, isEmpty);
       expect(notification.exceptions, equals(['foo']));
       expect(notification.stacks, equals(['bar']));
       expect(notification.contexts, equals(['baz']));
@@ -170,7 +170,7 @@ void main() {
       ..dispose();
 
     test('cannot be used after disposed', () {
-      expect(notification.errors, equals(<int>[1]));
+      expect(notification.errors, equals([1]));
       expect(() => notifier.set(2), throwsA(isA<AssertionError>()));
     });
 
