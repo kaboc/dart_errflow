@@ -390,7 +390,7 @@ void main() {
   });
 
   group('loggingScope()', () {
-    test('notifier is of LoggingErrNotifier type', () {
+    test('notifier is of type LoggingErrNotifier', () {
       errFlow.loggingScope<void>((notifier) {
         expect(notifier, isA<LoggingErrNotifier>());
       });
@@ -436,7 +436,7 @@ void main() {
   });
 
   group('ignorableScope()', () {
-    test('notifier is of IgnorableErrNotifier type', () {
+    test('notifier is of type IgnorableErrNotifier', () {
       errFlow.ignorableScope<void>((notifier) {
         expect(notifier, isA<IgnorableErrNotifier>());
       });
@@ -478,6 +478,61 @@ void main() {
         expect(log.stack, isNull);
         expect(log.reason, isNull);
       });
+    });
+  });
+
+  group('combiningScope()', () {
+    test('notifier is of type LoggingErrNotifier', () {
+      errFlow.combiningScope<void>((notifier) {
+        expect(notifier, isA<LoggingErrNotifier>());
+      });
+    });
+
+    test('Result has default error value if there was no error', () async {
+      final result = await errFlow.combiningScope((_) => 'abc');
+      expect(result.value, equals('abc'));
+      expect(result.error, equals(100));
+    });
+
+    test(
+      'error is null if there was no error and default error is null',
+      () async {
+        final errFlow2 = ErrFlow<int>(null);
+        final result = await errFlow2.combiningScope((_) => 'abc');
+        expect(result.value, equals('abc'));
+        expect(result.error, isNull);
+      },
+    );
+
+    test('hasError is false if there was no error', () async {
+      final result = await errFlow.combiningScope((_) => 'abc');
+      expect(result.hasError, isFalse);
+    });
+
+    test(
+      'hasError is false if there was no error and default error is null',
+      () async {
+        final errFlow2 = ErrFlow<int>(null);
+        final result = await errFlow2.combiningScope((_) => 'abc');
+        expect(result.hasError, isFalse);
+      },
+    );
+
+    test('hasError is true if there was an error', () async {
+      final result = await errFlow.combiningScope<String>((notifier) {
+        notifier.set(200);
+        return '';
+      });
+      expect(result.hasError, isTrue);
+    });
+
+    test('Result has both value and error if there was an error', () async {
+      final result = await errFlow.combiningScope<String>((notifier) {
+        notifier.set(300);
+        return 'def';
+      });
+      expect(result.value, 'def');
+      expect(result.error, 300);
     });
   });
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:meta/meta.dart';
 
+import 'combined_result.dart';
 import 'notifier_impl.dart';
 
 part 'notifier.dart';
@@ -251,4 +252,54 @@ class ErrFlow<T> {
 
     return result;
   }
+
+  /// Executes the provided function [process] with an object of
+  /// [LoggingErrNotifier] passed to it.
+  ///
+  /// This is similar to [loggingScope] but different in that this one
+  /// returns a combined result of the value returned by [process] and
+  /// the last error set with the [LoggingErrNotifier] passed by the scope.
+  ///
+  /// This is useful when you want to leave logging to the logger and
+  /// handle the error by yourself after the future of the scope completes.
+  ///
+  /// Note that even if there was no error, the `error` contained in
+  /// the result is non-null unless the default error value is `null`.
+  ///
+  /// ```dart
+  /// final result = await errFlow.combiningScope(calc);
+  ///   (notifier) => multiply(notifier, value),
+  /// );
+  ///
+  /// // The result contains the last error too, so it is possible
+  /// // to check and handle it outside of the scope.
+  /// if (result.hasError) {
+  ///   switch (result.error!) {
+  ///     case AppError.calc:
+  ///       print('[Error] Calculation failed.');
+  ///   }
+  /// }
+  /// ```
+  Future<CombinedResult<S, T>> combiningScope<S>(
+    FutureOr<S> Function(LoggingErrNotifier<T>) process,
+  ) async {
+    assert(_debugAssertNotDisposed());
+
+    final newNotifier = LoggingNotifier.from(_notifier);
+    final result = await process(newNotifier);
+    final error = newNotifier.lastError;
+
+    newNotifier.dispose();
+
+    return _Result(
+      value: result,
+      error: error,
+      hasError: error != defaultValue,
+    );
+  }
+}
+
+class _Result<S, T> extends CombinedResult<S, T> {
+  _Result({required S value, required T? error, required bool hasError})
+      : super(value: value, error: error, hasError: hasError);
 }

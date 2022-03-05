@@ -152,6 +152,35 @@ connection error:
 errorIf: (result, error) => !result && error != CustomError.connection
 ```
 
+### Handling an error manually
+
+[combiningScope][combining-scope] is useful when you want to manually check and handle
+an error, leaving only its logging to ErrFlow. 
+
+It basically works like [loggingScope][logging-scope] (described later), but returns
+[CombinedResult][combined-result] that has both a function result and an error.
+Using the combined result, it is possible to handle the error after the scope finishes.
+
+```dart
+final result = await errFlow.combiningScope(
+  (notifier) => yourMethod(notifier),
+);
+
+if (result.hasError) {
+  switch (result.error!) {
+    case AppError.init:
+      print('[ERROR] Initialization failed.');
+  }
+}
+```
+
+`CombinedResult` is similar to `Result` of package:async, but with some clear differences:
+
+- It has both a value and an error, whereas `Result` has only either of them.
+- It always has a value regardless of an error.
+- The default error value is set to `error` if there was no error.
+    - Having a non-null value in `error` does not always mean an error has occurred.
+
 ### Ignoring errors
 
 If a method, in which [set()][set] can be used, is called from some different places in
@@ -305,6 +334,8 @@ errFlow.removeListener(_listener);
 [scope]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/scope.html
 [logging-scope]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/loggingScope.html
 [ignorable-scope]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/ignorableScope.html
+[combining-scope]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/combiningScope.html
 [defaultlogger]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/useDefaultLogger.html
 
 [result]: https://pub.dev/documentation/async/latest/async/Result-class.html
+[combined-result]: https://pub.dev/documentation/errflow/latest/errflow/CombinedResult-class.html
