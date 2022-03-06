@@ -1,57 +1,77 @@
 import 'package:errflow/errflow.dart';
 
-enum CustomError {
+//===========================================================================
+// A basic example.
+// This example parses five strings to int and prints the following.
+//
+// '10' => 10
+// '20' => 20
+// [LOG] 'abc' - FormatException: Invalid radix-10 number (at character 1)
+// [CRITICAL] AppError.critical
+// 'abc' => 0
+// '40' => 40
+// '50' => 50
+//===========================================================================
+
+enum AppError {
   none,
   critical,
 }
 
-final errFlow = ErrFlow<CustomError>(CustomError.none);
+// A special class like this is good for keeping handlers tidy.
+class ErrorManager {
+  late final errFlow = ErrFlow<AppError>(AppError.none)
+    ..logger = _logger
+    ..errorHandler = _errorHandler // not used in this example
+    ..criticalErrorHandler = _criticalErrorHandler;
+
+  void dispose() {
+    errFlow.dispose();
+  }
+
+  void _logger(Object e, StackTrace? s, {Object? reason}) {
+    print("[LOG] '$reason' - ${e.toString().split('\n').first}");
+  }
+
+  void _errorHandler<T>(T result, AppError? error) {
+    print('[ERROR] $error');
+  }
+
+  void _criticalErrorHandler<T>(T result, AppError? error) {
+    print('[CRITICAL] $error');
+  }
+}
+
+//===========================================================================
 
 Future<void> main() async {
-  errFlow
-    ..logger = logger
-    ..errorHandler = errorHandler // not used in this example
-    ..criticalErrorHandler = criticalErrorHandler;
+  final errorManager = ErrorManager();
+  final errFlow = errorManager.errFlow;
 
-  for (var i = -2; i <= 2; i++) {
-    // Executes the dividedBy() method, and calls criticalErrorHandler
-    // if the last error is critical at the point when the method ends.
-    final result = await errFlow.scope<int>(
-      (notifier) => dividedBy(notifier, 10, i),
-      criticalIf: (result, error) => error == CustomError.critical,
+  for (final value in ['10', '20', 'abc', '40', '50']) {
+    // scope() executes toInt(), and calls criticalErrorHandler
+    // if the last error is critical at the point when the method ends,
+    // as well as logging the error.
+    final result = await errFlow.scope(
+      (notifier) => toInt(notifier, value),
+      criticalIf: (result, error) => error == AppError.critical,
     );
-    print('= $result');
+    print("'$value' => $result");
   }
 
-  errFlow.dispose();
+  errorManager.dispose();
 }
 
-void logger(Object e, StackTrace? s, {Object? reason}) {
-  print('Logged: $e');
-}
-
-void errorHandler<T>(T result, CustomError? error) {
-  print('Error: $error');
-}
-
-void criticalErrorHandler<T>(T result, CustomError? error) {
-  print('Critical error: $error');
-}
-
-int dividedBy(ErrNotifier notifier, int v1, int v2) {
-  print('\n$v1 ~/ $v2');
-
-  var result = 0;
-
-  // Treats the exception caused by division by zero as a critical error,
-  // and logs other exceptions (which in fact never occur in this example).
+int toInt(ErrNotifier notifier, String text) {
+  // Treats FormatException caused by int.parse() as a critical error, and
+  // only logs other exceptions (which in fact never occur in this example).
   try {
-    result = v1 ~/ v2;
-  } on IntegerDivisionByZeroException catch (e, s) {
-    notifier.set(CustomError.critical, e, s);
+    return int.parse(text);
+  } on FormatException catch (e, s) {
+    notifier.set(AppError.critical, e, s, text);
   } on Exception catch (e, s) {
-    notifier.log(e, s);
+    notifier.log(e, s, text);
   }
 
-  return result;
+  return 0;
 }
