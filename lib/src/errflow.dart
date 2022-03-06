@@ -223,9 +223,9 @@ class ErrFlow<T> {
   ) async {
     assert(_debugAssertNotDisposed());
 
-    final loggingNotifier = LoggingNotifier.from(_notifier);
-    final result = await process(loggingNotifier);
-    loggingNotifier.dispose();
+    final newNotifier = LoggingNotifier.from(_notifier);
+    final result = await process(newNotifier);
+    newNotifier.dispose();
 
     return result;
   }
@@ -246,9 +246,9 @@ class ErrFlow<T> {
   ) async {
     assert(_debugAssertNotDisposed());
 
-    final ignorableNotifier = IgnorableNotifier.from(_notifier);
-    final result = await process(ignorableNotifier);
-    ignorableNotifier.dispose();
+    final newNotifier = IgnorableNotifier.from(_notifier);
+    final result = await process(newNotifier);
+    newNotifier.dispose();
 
     return result;
   }
