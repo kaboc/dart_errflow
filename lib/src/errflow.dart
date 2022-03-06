@@ -11,8 +11,8 @@ class ErrFlow<T> {
   /// Creates an ErrFlow that facilitates handling and logging of errors.
   ///
   /// The generic type [T] is the type of error values. The provided
-  /// [defaultValue] is used as the initial value in notifiers,
-  /// representing that there is no error initially in each [scope()].
+  /// [defaultValue] is used as the initial value in notifiers, representing
+  /// the state where there is no error initially in each [scope()].
   ErrFlow([T? defaultValue]) {
     _notifier = Notifier<T>(defaultValue)
       ..addListener(
@@ -147,16 +147,17 @@ class ErrFlow<T> {
 
   /// Executes the provided function [process], and then calls either of
   /// the [onError] and [onCriticalError] callbacks if the condition
-  /// specified by [errorIf] or [criticalIf] is met respectively.
+  /// specified by [errorIf] or [criticalIf] is met respectively at the
+  /// point when the [process] ends.
   ///
-  /// A new object of [ErrNotifier] is passed to [process] to allow to call
+  /// An object of [ErrNotifier] is passed to [process] to allow to call
   /// [ErrNotifier.set()] or [ErrNotifier.log()] on the object. Use the
   /// object also to access to [ErrNotifier.lastError] to see what the most
-  /// resent error was. If there was no error, [ErrNotifier.lastError] holds
+  /// recent error was. If there was no error, [ErrNotifier.lastError] holds
   /// the default value specified in the constructor of [ErrFlow].
   ///
   /// All of the other parameters are also functions, which receive the
-  /// result of the [process] and the last error that occurred inside it.
+  /// result of the [process] and the last error set inside it.
   /// If there is no error, the default value is provided as the last error.
   ///
   /// [onError] (or [errorHandler] if [onError] is not specified) is called

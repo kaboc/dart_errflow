@@ -25,7 +25,8 @@ a way to pass a result and/or an error from a method to the caller; the former h
 of the values, and the latter allows the caller to evaluate both values.
 
 A big difference is that this package also provides handlers and a logger to enable errors
-to be handled more easily in a unified manner.
+to be handled more easily in a unified manner. It makes it possible that error handling
+is centralized.
 
 ## Usage
 
@@ -63,12 +64,20 @@ final errFlow = ErrFlow<Exception>();
 
 ### Setting/logging an error
 
-1. Use `scope()` to pass an [ErrNotifier][notifier] to a function that can cause an error.
-2. Call [set()][set] on the notifier object when some exception happens in the function.
+The notifier passed to the callback function of [scope()][scope] has the [set()][set] method
+used for updating the error value and calling the logger, and the [log()][log] method for
+only triggering the logger.
+
+1. Use [scope()][scope] to pass an [ErrNotifier][notifier] to a function that can cause an error.
+2. Call [set()][set] on the notifier when some error happens in the function.
 3. The listener is notified of the error and stores it as the last error ([lastError][lasterror])
-   so that it can be checked later inside the function executed by [scope()][scope].
-4. The listener also calls the [logger][logger] to log a set of information about the exception
+   so that it can be checked later inside the function.
+4. The listener also calls the [logger][logger] to log a set of information about the error
    if it is provided via [set()][set] or [log()][log].
+5. One of the error handlers is called after the callback completes if a condition to
+   call it is met.
+
+Error handlers are explained in detail later in this document.
 
 ```dart
 final result = await errFlow.scope<bool>(
@@ -81,12 +90,12 @@ final result = await errFlow.scope<bool>(
 Future<bool> yourFunc(ErrNotifier notifier) async {
   try {
     await errorProneProcess();
-  } catch(e, s) {
-    // This updates the last error value and also triggers logging.
+  } catch (e, s) {
+    // This updates the last error value and also triggers the logger.
     notifier.set(CustomError.foo, e, s, 'additional info');
   }
 
-  // You can use hasError to check if some error was set.
+  // If necessary, you can use hasError to check if some error was set.
   if (notifier.hasError) {
     ...
     return false;
@@ -114,9 +123,9 @@ It is not impossible to remove the hassle to have to pass over an object of
 [ErrNotifier][notifier], but I choose not to do so because method signatures with a
 parameter of type `ErrNotifier` help you spot which methods require error handling.
 
-### Handling errors
+### Handling an error
 
-[scope()][scope] executes a function, and handles errors that have occurred inside there at
+[scope()][scope] executes a function, and handles an error that has occurred inside there at
 the point when the function finishes according to the conditions specified by `errorIf` and
 `criticalIf`. Use both or either of them to set the conditions of whether to treat the function
 result as a non-critical/critical error. The condition of `criticalIf` is evaluated prior to
@@ -129,8 +138,13 @@ on the severity of the error.
 ```dart
 final result = await errFlow.scope<bool>(
   (notifier) => yourMethod(notifier),
+
+  // Use both or only either of errorIf and criticalIf.
   errorIf: (result, error) => error == CustomError.foo,
   criticalIf: (result, error) => error == CustomError.bar,
+
+  // There is a way to avoid writing onError and onCriticalError
+  // every time, which is explained later.
   onError: (result, error) => _onError(result, error),
   onCriticalError: (result, error) => _onCriticalError(result, error),
 );
@@ -154,10 +168,10 @@ errorIf: (result, error) => !result && error != CustomError.connection
 
 ### Handling an error manually
 
-[combiningScope][combining-scope] is useful when you want to manually check and handle
+[combiningScope()][combining-scope] is useful when you want to manually check and handle
 an error, leaving only its logging to ErrFlow. 
 
-It basically works like [loggingScope][logging-scope] (described later), but returns
+It basically works like [loggingScope()][logging-scope] (described later), but returns
 [CombinedResult][combined-result] that has both a function result and an error.
 Using the combined result, it is possible to handle the error after the scope finishes.
 
@@ -184,13 +198,13 @@ if (result.hasError) {
 ### Ignoring errors
 
 If a method, in which [set()][set] can be used, is called from some different places in
-your code, you may want to show an error message at some of them but not at the others.
-It is possible with the use of [loggingScope][logging-scope] and [ignorableScope][ignorable-scope],
+your code, you may want to show an error message at some of them but not at the other places.
+It is possible with the use of [loggingScope()][logging-scope] and [ignorableScope()][ignorable-scope],
 allowing you to only log errors without handling them, or ignore them completely.
 
 *loggingScope()*
 
-`notifier` passed from [loggingScope][logging-scope] is an object of
+`notifier` passed from [loggingScope()][logging-scope] is an object of
 [LoggingErrNotifier][logging-notifier]. Calling [set()][logging-set] on that object only
 updates the value of [lastError][lasterror] and triggers the logger (and added listener
 functions), without triggering the error handlers.
@@ -203,7 +217,7 @@ final result = await errFlow.loggingScope<bool>(
 bool yourMethod(ErrNotifier notifier) {
   try {
     return ...;
-  } catch(e, s) {
+  } catch (e, s) {
     notifier.set(CustomError.foo, e, s);  // Only updates lastError and logs the error.
     return false;
   }
@@ -212,7 +226,7 @@ bool yourMethod(ErrNotifier notifier) {
 
 *ignorableScope()*
 
-`notifier` passed from [ignorableScope][ignorable-scope] is an object of
+`notifier` passed from [ignorableScope()][ignorable-scope] is an object of
 [IgnorableErrNotifier][ignorable-notifier]. Calling [set()][ignorable-set] and
 [log()][ignorable-log] on that object does not trigger the error handlers nor the logger.
 [set()][ignorable-set] only updates the value of [lastError][lasterror].
@@ -225,7 +239,7 @@ final result = await errFlow.ignorableScope<bool>(
 bool yourMethod(ErrNotifier notifier) {
   try {
     return ...;
-  } catch(e, s) {
+  } catch (e, s) {
     notifier.set(CustomError.foo, e, s);  // Only updates lastError.
     return false;
   }
@@ -336,6 +350,5 @@ errFlow.removeListener(_listener);
 [ignorable-scope]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/ignorableScope.html
 [combining-scope]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/combiningScope.html
 [defaultlogger]: https://pub.dev/documentation/errflow/latest/errflow/ErrFlow/useDefaultLogger.html
-
 [result]: https://pub.dev/documentation/async/latest/async/Result-class.html
 [combined-result]: https://pub.dev/documentation/errflow/latest/errflow/CombinedResult-class.html
