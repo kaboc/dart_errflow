@@ -1,3 +1,12 @@
+## 0.5.0
+
+* Refactor error notifiers.
+    * Dart 2.15 or above is required.
+* Add `CombinedResult` and `combiningScope()`.
+* Rename local variables and a test file.
+* Improve documentation.
+* Improve the example and add another one.
+
 ## 0.4.1
 
 * Update dependencies.
