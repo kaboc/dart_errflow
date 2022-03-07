@@ -123,6 +123,7 @@ class ErrFlow<T> {
     final hasLogger = logger != null;
     final loggerType = logger == _defaultLogger ? 'default' : 'custom';
 
+    // ignore: no_runtimeType_toString
     return '$runtimeType#$hashCode('
         'listeners: $listenerCount, '
         'defaultValue: ${_notifier.defaultValue}, '

@@ -1,3 +1,5 @@
+// ignore_for_file: cascade_invocations
+
 import 'package:test/test.dart';
 
 import 'package:errflow/src/errflow.dart';
@@ -7,46 +9,46 @@ void main() {
 
   group('function passed to scope()', () {
     test('defaultValue has the default value set in constructor', () {
-      errFlow.scope<void>((notifier) {
+      errFlow.scope((notifier) {
         expect(errFlow.defaultValue, equals(100));
       });
     });
 
     test('defaultValue can be null', () {
-      final errFlow2 = ErrFlow<int>(null);
-      errFlow.scope<void>((notifier) {
+      final errFlow2 = ErrFlow<int>();
+      errFlow.scope((notifier) {
         expect(errFlow2.defaultValue, isNull);
       });
     });
 
     test('defaultValue does not change even if set() is called', () {
-      errFlow.scope<void>((notifier) {
+      errFlow.scope((notifier) {
         notifier.set(200);
         expect(errFlow.defaultValue, equals(100));
       });
     });
 
     test('notifier has the default value', () async {
-      await errFlow.scope<void>((notifier) {
+      await errFlow.scope((notifier) {
         notifier.set(200);
       });
 
-      errFlow.scope<void>((notifier) {
+      await errFlow.scope((notifier) {
         expect(notifier.lastError, equals(100));
       });
 
-      final errFlow2 = ErrFlow<int>(null);
-      await errFlow2.scope<void>((notifier) {
+      final errFlow2 = ErrFlow<int>();
+      await errFlow2.scope((notifier) {
         notifier.set(200);
       });
 
-      errFlow2.scope<void>((notifier) {
+      await errFlow2.scope((notifier) {
         expect(notifier.lastError, isNull);
       });
     });
 
     test('lastError is updated when set() is called', () {
-      errFlow.scope<void>((notifier) {
+      errFlow.scope((notifier) {
         notifier.set(200);
         expect(notifier.lastError, equals(200));
       });
@@ -68,14 +70,14 @@ void main() {
     );
 
     test('hasError returns an appropriate value', () {
-      errFlow.scope<void>((notifier) {
+      errFlow.scope((notifier) {
         expect(notifier.hasError, isFalse);
         notifier.set(200);
         expect(notifier.hasError, isTrue);
       });
 
       final errFlow2 = ErrFlow<int>();
-      errFlow2.scope<void>((notifier) {
+      errFlow2.scope((notifier) {
         expect(notifier.hasError, isFalse);
         notifier.set(200);
         expect(notifier.hasError, isTrue);
@@ -86,7 +88,7 @@ void main() {
   group('errorIf / onError', () {
     test('assert() fails if both onError and eventHandler are missing', () {
       expect(
-        () => errFlow.scope<void>(
+        () => errFlow.scope(
           (_) => null,
           errorIf: (_, __) => true,
         ),
@@ -97,7 +99,7 @@ void main() {
     test('onError is called even without set() if errorIf is true', () async {
       var r = false;
 
-      await errFlow.scope<void>(
+      await errFlow.scope(
         (_) => null,
         errorIf: (_, __) => true,
         onError: (_, __) => r = true,
@@ -107,13 +109,13 @@ void main() {
     });
 
     test('onError is called only when errorIf is true', () {
-      errFlow.scope<void>(
+      errFlow.scope(
         (_) => null,
         errorIf: (_, __) => false,
         onError: (_, __) => expect(false, isTrue),
       );
 
-      errFlow.scope<void>(
+      errFlow.scope(
         (_) => null,
         errorIf: (_, __) => true,
         onError: (_, __) => expect(true, isTrue),
@@ -144,7 +146,7 @@ void main() {
       'assert() fails if onCriticalError and criticalErrorHandler are missing',
       () {
         expect(
-          () => errFlow.scope<void>(
+          () => errFlow.scope(
             (_) => null,
             criticalIf: (_, __) => true,
           ),
@@ -158,7 +160,7 @@ void main() {
       () async {
         var r = false;
 
-        await errFlow.scope<void>(
+        await errFlow.scope(
           (_) => null,
           criticalIf: (_, __) => true,
           onCriticalError: (_, __) => r = true,
@@ -169,13 +171,13 @@ void main() {
     );
 
     test('onCriticalError is called only when criticalIf is true', () {
-      errFlow.scope<void>(
+      errFlow.scope(
         (_) => null,
         criticalIf: (_, __) => false,
         onCriticalError: (_, __) => expect(false, isTrue),
       );
 
-      errFlow.scope<void>(
+      errFlow.scope(
         (_) => null,
         criticalIf: (_, __) => true,
         onCriticalError: (_, __) => expect(true, isTrue),
@@ -203,7 +205,7 @@ void main() {
 
   group('criticalIf / onCriticalError', () {
     test('errorIf is ignored if condition of criticalIf is met', () {
-      errFlow.scope<void>(
+      errFlow.scope(
         (_) => null,
         errorIf: (_, __) => true,
         criticalIf: (_, __) => true,
@@ -235,7 +237,7 @@ void main() {
 
       errFlow.errorHandler = <bool>(_, __) => r1 = true;
 
-      await errFlow.scope<void>(
+      await errFlow.scope(
         (_) => null,
         errorIf: (_, __) => true,
         onError: (_, __) => r2 = true,
@@ -266,7 +268,7 @@ void main() {
 
       errFlow.errorHandler = <bool>(_, __) => r1 = true;
 
-      await errFlow.scope<void>(
+      await errFlow.scope(
         (_) => null,
         criticalIf: (_, __) => true,
         onCriticalError: (_, __) => r2 = true,
@@ -280,14 +282,19 @@ void main() {
   group('concurrency', () {
     test('error in a scope does not affect another concurrent scope', () async {
       var i = 0;
-      final listener = (
-          {int? error, Object? exception, StackTrace? stack, Object? context}) {
+      void listener({
+        int? error,
+        Object? exception,
+        StackTrace? stack,
+        Object? context,
+      }) {
         expect(error, equals(++i == 1 ? 200 : 300));
-      };
+      }
+
       errFlow.addListener(listener);
 
       await Future.wait([
-        errFlow.scope<void>(
+        errFlow.scope(
           (notifier) async {
             notifier.set(200);
             await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -295,7 +302,7 @@ void main() {
           },
           onError: (result, error) => expect(error, equals(200)),
         ),
-        errFlow.scope<void>(
+        errFlow.scope(
           (notifier) {
             notifier.set(300);
             expect(notifier.lastError, equals(300));
@@ -313,7 +320,7 @@ void main() {
       final log = _Log();
       errFlow.logger = log.logger;
 
-      errFlow.scope<void>((notifier) {
+      errFlow.scope((notifier) {
         notifier.log('foo', _StackTrace('bar'), 'baz');
         expect(log.exception, equals('foo'));
         expect(log.stack.toString(), equals('bar'));
@@ -323,27 +330,31 @@ void main() {
 
     test('logger can return Future but is not awaited', () async {
       final log = _Log();
-      errFlow.logger = log.loggerWith100msDelay;
 
-      errFlow.scope<void>((notifier) {
-        notifier.log('foo', _StackTrace('bar'), 'baz');
-        expect(() => log.exception, throwsA(isA<Error>()));
-        expect(log.stack, isNull);
-        expect(log.reason, isNull);
+      await errFlow.scope((notifier) {
+        errFlow.logger = log.loggerWith100msDelay;
+        notifier.log('foo1', _StackTrace('bar1'), 'baz1');
+
+        errFlow.logger = log.logger;
+        notifier.log('foo2', _StackTrace('bar2'), 'baz2');
+
+        expect(log.exception, equals('foo2'));
+        expect(log.stack.toString(), equals('bar2'));
+        expect(log.reason, equals('baz2'));
       });
 
       await Future<void>.delayed(const Duration(milliseconds: 200));
 
-      expect(log.exception, equals('foo'));
-      expect(log.stack.toString(), equals('bar'));
-      expect(log.reason, equals('baz'));
+      expect(log.exception, equals('foo1'));
+      expect(log.stack.toString(), equals('bar1'));
+      expect(log.reason, equals('baz1'));
     });
 
     test('logger is called with correct values when context is omitted', () {
       final log = _Log();
       errFlow.logger = log.logger;
 
-      errFlow.scope<void>((notifier) {
+      errFlow.scope((notifier) {
         notifier.log('foo', _StackTrace('bar'));
         expect(log.exception, equals('foo'));
         expect(log.stack.toString(), equals('bar'));
@@ -355,7 +366,7 @@ void main() {
       final log = _Log();
       errFlow.logger = log.logger;
 
-      errFlow.scope<void>((notifier) {
+      errFlow.scope((notifier) {
         notifier.set(200, 'foo', _StackTrace('bar'), 'baz');
         expect(log.exception, equals('foo'));
         expect(log.stack.toString(), equals('bar'));
@@ -366,7 +377,7 @@ void main() {
     test('assert() fails if no logger is set but exception is provided', () {
       errFlow.logger = null;
 
-      errFlow.scope<void>((notifier) {
+      errFlow.scope((notifier) {
         expect(
           () => notifier.log(200, _StackTrace('bar')),
           throwsA(isA<AssertionError>()),
@@ -379,7 +390,7 @@ void main() {
       () {
         errFlow.useDefaultLogger();
 
-        errFlow.scope<void>((notifier) {
+        errFlow.scope((notifier) {
           expect(
             () => notifier.set(200, null, _StackTrace('bar'), 'baz'),
             throwsA(isA<AssertionError>()),
@@ -391,23 +402,23 @@ void main() {
 
   group('loggingScope()', () {
     test('notifier is of type LoggingErrNotifier', () {
-      errFlow.loggingScope<void>((notifier) {
+      errFlow.loggingScope((notifier) {
         expect(notifier, isA<LoggingErrNotifier>());
       });
     });
 
     test('notifier has the default value', () async {
-      await errFlow.loggingScope<void>((notifier) {
+      await errFlow.loggingScope((notifier) {
         notifier.set(200);
       });
 
-      errFlow.loggingScope<void>((notifier) {
+      await errFlow.loggingScope((notifier) {
         expect(notifier.lastError, equals(100));
       });
     });
 
     test('set() updates last error', () {
-      errFlow.loggingScope<void>((notifier) {
+      errFlow.loggingScope((notifier) {
         expect(notifier.lastError, equals(100));
         notifier.set(200);
         expect(notifier.lastError, equals(200));
@@ -415,7 +426,7 @@ void main() {
     });
 
     test('hasError returns an appropriate value', () {
-      errFlow.loggingScope<void>((notifier) {
+      errFlow.loggingScope((notifier) {
         expect(notifier.hasError, isFalse);
         notifier.set(200);
         expect(notifier.hasError, isTrue);
@@ -426,7 +437,7 @@ void main() {
       final log = _Log();
       errFlow.logger = log.logger;
 
-      errFlow.loggingScope<void>((notifier) {
+      errFlow.loggingScope((notifier) {
         notifier.log('foo', _StackTrace('bar'), 'baz');
         expect(log.exception, equals('foo'));
         expect(log.stack.toString(), equals('bar'));
@@ -437,23 +448,23 @@ void main() {
 
   group('ignorableScope()', () {
     test('notifier is of type IgnorableErrNotifier', () {
-      errFlow.ignorableScope<void>((notifier) {
+      errFlow.ignorableScope((notifier) {
         expect(notifier, isA<IgnorableErrNotifier>());
       });
     });
 
     test('notifier has the default value', () async {
-      await errFlow.ignorableScope<void>((notifier) {
+      await errFlow.ignorableScope((notifier) {
         notifier.set(200);
       });
 
-      errFlow.ignorableScope<void>((notifier) {
+      await errFlow.ignorableScope((notifier) {
         expect(notifier.lastError, equals(100));
       });
     });
 
     test('set() updates last error', () {
-      errFlow.ignorableScope<void>((notifier) {
+      errFlow.ignorableScope((notifier) {
         expect(notifier.lastError, equals(100));
         notifier.set(200);
         expect(notifier.lastError, equals(200));
@@ -461,7 +472,7 @@ void main() {
     });
 
     test('hasError returns an appropriate value', () {
-      errFlow.ignorableScope<void>((notifier) {
+      errFlow.ignorableScope((notifier) {
         expect(notifier.hasError, isFalse);
         notifier.set(200);
         expect(notifier.hasError, isTrue);
@@ -472,7 +483,7 @@ void main() {
       final log = _Log();
       errFlow.logger = log.logger;
 
-      errFlow.ignorableScope<void>((notifier) {
+      errFlow.ignorableScope((notifier) {
         notifier.log('foo', _StackTrace('bar'), 'baz');
         expect(() => log.exception, throwsA(isA<Error>()));
         expect(log.stack, isNull);
@@ -483,7 +494,7 @@ void main() {
 
   group('combiningScope()', () {
     test('notifier is of type LoggingErrNotifier', () {
-      errFlow.combiningScope<void>((notifier) {
+      errFlow.combiningScope((notifier) {
         expect(notifier, isA<LoggingErrNotifier>());
       });
     });
@@ -497,7 +508,7 @@ void main() {
     test(
       'error is null if there was no error and default error is null',
       () async {
-        final errFlow2 = ErrFlow<int>(null);
+        final errFlow2 = ErrFlow<int>();
         final result = await errFlow2.combiningScope((_) => 'abc');
         expect(result.value, equals('abc'));
         expect(result.error, isNull);
@@ -512,7 +523,7 @@ void main() {
     test(
       'hasError is false if there was no error and default error is null',
       () async {
-        final errFlow2 = ErrFlow<int>(null);
+        final errFlow2 = ErrFlow<int>();
         final result = await errFlow2.combiningScope((_) => 'abc');
         expect(result.hasError, isFalse);
       },
@@ -586,12 +597,11 @@ class _Log {
     StackTrace? s, {
     Object? reason,
   }) async {
-    await (() async {
-      await Future<void>.delayed(const Duration(milliseconds: 100));
+    await Future<void>.delayed(const Duration(milliseconds: 100), () {
       exception = e;
       stack = s;
       this.reason = reason;
-    })();
+    });
   }
 }
 

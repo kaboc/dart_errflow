@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 /// some computation.
 @sealed
 abstract class CombinedResult<S, T> {
+  // ignore: public_member_api_docs
   const CombinedResult({
     required this.value,
     required this.error,

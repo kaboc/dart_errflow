@@ -189,8 +189,12 @@ class _Notification {
   List stacks = <String>[];
   List contexts = <Object>[];
 
-  void listener(
-      {int? error, Object? exception, StackTrace? stack, Object? context}) {
+  void listener({
+    int? error,
+    Object? exception,
+    StackTrace? stack,
+    Object? context,
+  }) {
     if (error != null) {
       errors.add(error);
     }
