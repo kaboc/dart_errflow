@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
 /// A class that holds both a value and an error as a result of
 /// some computation.
+@sealed
 abstract class CombinedResult<S, T> {
   const CombinedResult({
     required this.value,
