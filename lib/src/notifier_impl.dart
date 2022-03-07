@@ -39,9 +39,17 @@ mixin _Base<T> {
         'lastError: $_lastError)';
   }
 
+  Never throwStateError() {
+    throw StateError(
+      'A ErrFlow<$T> was used after being disposed.\n'
+      'Once you have called dispose() on a ErrFlow<$T>, '
+      'it can no longer be used.',
+    );
+  }
+
   void set(T error, [Object? exception, StackTrace? stack, Object? context]) {
-    assert(!_isDisposed);
-    assert(error != null);
+    if (_isDisposed) throwStateError();
+    assert(error != null, '`null` cannot be passed to set() as an error.');
 
     _lastError = error;
 
@@ -56,7 +64,7 @@ mixin _Base<T> {
   }
 
   void log(Object exception, [StackTrace? stack, Object? context]) {
-    assert(!_isDisposed);
+    if (_isDisposed) throwStateError();
 
     for (final listener in _listeners) {
       listener(exception: exception, stack: stack, context: context);
@@ -99,15 +107,15 @@ class IgnorableNotifier<T> with _Base<T> implements IgnorableErrNotifier<T> {
 
   @override
   void set(T error, [Object? exception, StackTrace? stack, Object? context]) {
-    assert(!_isDisposed);
-    assert(error != null);
+    if (_isDisposed) throwStateError();
+    assert(error != null, '`null` cannot be passed to set() as an error.');
 
     _lastError = error;
   }
 
   @override
   void log(Object exception, [StackTrace? stack, Object? context]) {
-    assert(!_isDisposed);
+    if (_isDisposed) throwStateError();
     // noop
   }
 

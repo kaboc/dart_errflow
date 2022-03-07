@@ -173,7 +173,7 @@ void main() {
     test('cannot be used after disposed', () {
       notifier.dispose();
       expect(notification.errors, equals([1]));
-      expect(() => notifier.set(2), throwsA(isA<AssertionError>()));
+      expect(() => notifier.set(2), throwsA(isA<StateError>()));
     });
 
     test('calling toString() after dispose() causes no error', () {

@@ -72,20 +72,6 @@ class ErrFlow<T> {
   /// class and its variants in each [scope()].
   T? get defaultValue => _notifier.defaultValue;
 
-  bool _debugAssertNotDisposed() {
-    assert(() {
-      if (_notifier.isDisposed) {
-        throw AssertionError(
-          'A $runtimeType was used after being disposed.\n'
-          'Once you have called dispose() on a $runtimeType, '
-          'it can no longer be used.',
-        );
-      }
-      return true;
-    }());
-    return true;
-  }
-
   /// Discards the resources used by the object. After this is called,
   /// the object is not in a usable state and should be discarded.
   void dispose() {
@@ -98,7 +84,7 @@ class ErrFlow<T> {
   ///
   /// This method must not be called after [dispose()] has been called.
   void addListener(ErrListener<T> listener) {
-    assert(_debugAssertNotDisposed());
+    if (_notifier.isDisposed) _notifier.throwStateError();
     _notifier.addListener(listener);
   }
 
@@ -107,14 +93,14 @@ class ErrFlow<T> {
   ///
   /// This method must not be called after [dispose()] has been called.
   void removeListener(ErrListener<T> listener) {
-    assert(_debugAssertNotDisposed());
+    if (_notifier.isDisposed) _notifier.throwStateError();
     _notifier.removeListener(listener);
   }
 
   /// Sets the default logger to be used, which outputs information such
   /// as the message of an exception and the stack trace to the console.
   void useDefaultLogger() {
-    assert(_debugAssertNotDisposed());
+    if (_notifier.isDisposed) _notifier.throwStateError();
     logger = _defaultLogger;
   }
 
@@ -172,7 +158,7 @@ class ErrFlow<T> {
     void Function(S, T?)? onError,
     void Function(S, T?)? onCriticalError,
   }) async {
-    assert(_debugAssertNotDisposed());
+    if (_notifier.isDisposed) _notifier.throwStateError();
     assert(
       errorIf == null || onError != null || errorHandler != null,
       'The handler for non-critical errors is missing while `errorIf` '
@@ -222,7 +208,7 @@ class ErrFlow<T> {
   Future<S> loggingScope<S>(
     FutureOr<S> Function(LoggingErrNotifier<T>) process,
   ) async {
-    assert(_debugAssertNotDisposed());
+    if (_notifier.isDisposed) _notifier.throwStateError();
 
     final newNotifier = LoggingNotifier.from(_notifier);
     final result = await process(newNotifier);
@@ -245,7 +231,7 @@ class ErrFlow<T> {
   Future<S> ignorableScope<S>(
     FutureOr<S> Function(IgnorableErrNotifier<T>) process,
   ) async {
-    assert(_debugAssertNotDisposed());
+    if (_notifier.isDisposed) _notifier.throwStateError();
 
     final newNotifier = IgnorableNotifier.from(_notifier);
     final result = await process(newNotifier);
@@ -284,7 +270,7 @@ class ErrFlow<T> {
   Future<CombinedResult<S, T>> combiningScope<S>(
     FutureOr<S> Function(LoggingErrNotifier<T>) process,
   ) async {
-    assert(_debugAssertNotDisposed());
+    if (_notifier.isDisposed) _notifier.throwStateError();
 
     final newNotifier = LoggingNotifier.from(_notifier);
     final result = await process(newNotifier);

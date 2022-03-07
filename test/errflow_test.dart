@@ -543,12 +543,29 @@ void main() {
 
     test('cannot be used after disposed', () {
       errFlow2.dispose();
-      expect(() => errFlow2.scope((_) {}), throwsA(isA<AssertionError>()));
+      expect(() => errFlow2.scope((_) {}), throwsA(isA<StateError>()));
     });
 
     test('calling toString() after dispose() causes no error', () {
       errFlow2.dispose();
       expect(errFlow2.toString, isNot(throwsA(anything)));
+    });
+
+    test('calling dispose() in scope does not stop notifier in the scope', () {
+      final log = _Log();
+      errFlow2.logger = log.logger;
+
+      errFlow2.scope((notifier) {
+        errFlow2.dispose();
+
+        // dispose() above is not applied to the notifier here because
+        // this is a copy of the notifier held globally in ErrFlow.
+        // Only the global one has been disposed and this instance is not.
+        notifier.log('foo');
+        expect(log.exception, equals('foo'));
+      });
+
+      expect(() => errFlow2.scope((_) {}), throwsA(isA<StateError>()));
     });
   });
 }
