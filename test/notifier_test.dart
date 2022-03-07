@@ -161,24 +161,24 @@ void main() {
   });
 
   group('dispose', () {
-    final notifier = Notifier<int>(10);
     final notification = _Notification();
+    late Notifier<int> notifier;
 
-    notifier
-      ..addListener(notification.listener)
-      ..set(1)
-      ..dispose();
+    setUp(() {
+      notifier = Notifier<int>(10)
+        ..addListener(notification.listener)
+        ..set(1);
+    });
 
     test('cannot be used after disposed', () {
+      notifier.dispose();
       expect(notification.errors, equals([1]));
       expect(() => notifier.set(2), throwsA(isA<AssertionError>()));
     });
 
     test('calling toString() after dispose() causes no error', () {
-      expect(
-        () => notifier.toString(),
-        isNot(throwsA(isA<AssertionError>())),
-      );
+      notifier.dispose();
+      expect(notifier.toString, isNot(throwsA(anything)));
     });
   });
 }

@@ -537,28 +537,18 @@ void main() {
   });
 
   group('dispose', () {
-    final errFlow2 = ErrFlow<int>(100);
-    errFlow2.dispose();
+    late ErrFlow<int> errFlow2;
+
+    setUp(() => errFlow2 = ErrFlow<int>(100));
 
     test('cannot be used after disposed', () {
-      final listener = ({
-        int? error,
-        Object? exception,
-        StackTrace? stack,
-        Object? context,
-      }) {};
-
-      expect(
-        () => errFlow2.addListener(listener),
-        throwsA(isA<AssertionError>()),
-      );
+      errFlow2.dispose();
+      expect(() => errFlow2.scope((_) {}), throwsA(isA<AssertionError>()));
     });
 
     test('calling toString() after dispose() causes no error', () {
-      expect(
-        () => errFlow2.toString(),
-        isNot(throwsA(isA<AssertionError>())),
-      );
+      errFlow2.dispose();
+      expect(errFlow2.toString, isNot(throwsA(anything)));
     });
   });
 }
