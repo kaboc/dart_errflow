@@ -62,7 +62,7 @@ Future<void> main() async {
   errorManager.dispose();
 }
 
-int toInt(ErrNotifier notifier, String text) {
+int toInt(ErrNotifier<AppError> notifier, String text) {
   // Treats FormatException caused by int.parse() as a critical error, and
   // only logs other exceptions (which in fact never occur in this example).
   try {

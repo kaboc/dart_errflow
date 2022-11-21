@@ -184,10 +184,10 @@ void main() {
 }
 
 class _Notification {
-  List errors = <int>[];
-  List exceptions = <Object>[];
-  List stacks = <String>[];
-  List contexts = <Object>[];
+  List<int> errors = [];
+  List<Object> exceptions = [];
+  List<String> stacks = [];
+  List<Object> contexts = [];
 
   void listener({
     int? error,

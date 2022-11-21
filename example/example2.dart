@@ -63,7 +63,7 @@ Future<void> main() async {
   errorManager.dispose();
 }
 
-Future<int> toInt(ErrNotifier notifier, String text) async {
+Future<int> toInt(ErrNotifier<AppError> notifier, String text) async {
   try {
     return int.parse(text);
   } on Exception catch (e, s) {

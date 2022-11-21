@@ -403,6 +403,7 @@ void main() {
   group('loggingScope()', () {
     test('notifier is of type LoggingErrNotifier', () {
       errFlow.loggingScope((notifier) {
+        // ignore: strict_raw_type
         expect(notifier, isA<LoggingErrNotifier>());
       });
     });
@@ -449,6 +450,7 @@ void main() {
   group('ignorableScope()', () {
     test('notifier is of type IgnorableErrNotifier', () {
       errFlow.ignorableScope((notifier) {
+        // ignore: strict_raw_type
         expect(notifier, isA<IgnorableErrNotifier>());
       });
     });
@@ -495,6 +497,7 @@ void main() {
   group('combiningScope()', () {
     test('notifier is of type LoggingErrNotifier', () {
       errFlow.combiningScope((notifier) {
+        // ignore: strict_raw_type
         expect(notifier, isA<LoggingErrNotifier>());
       });
     });
