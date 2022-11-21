@@ -105,11 +105,14 @@ class ErrFlow<T> {
   }
 
   void _defaultLogger(Object exception, StackTrace? stack, {Object? reason}) {
+    // ignore: avoid_print
     print(exception);
     if (stack != null) {
+      // ignore: avoid_print
       print(stack);
     }
     if (reason != null) {
+      // ignore: avoid_print
       print(reason);
     }
   }
@@ -288,6 +291,9 @@ class ErrFlow<T> {
 }
 
 class _Result<S, T> extends CombinedResult<S, T> {
-  _Result({required S value, required T? error, required bool hasError})
-      : super(value: value, error: error, hasError: hasError);
+  _Result({
+    required super.value,
+    required super.error,
+    required super.hasError,
+  });
 }

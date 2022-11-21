@@ -2,11 +2,11 @@ name: errflow_example
 description: An example of errflow.
 
 environment:
-  sdk: ">=2.15.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
   errflow:
     path: ../
 
 dev_dependencies:
-  lints: ^1.0.1
+  lints: ^2.0.1
