@@ -65,7 +65,7 @@ class ErrFlow<T> {
   /// some named parameters existing in `recordError()`), and thus the
   /// `FirebaseCrashlytics.recordError` can be assigned to the logger as is
   /// if you want to leave logging operations to Crashlytics.
-  FutureOr<void> Function(Object, StackTrace?, {Object? reason})? logger;
+  void Function(Object, StackTrace?, {Object? reason})? logger;
 
   /// A getter for the value that was set in the constructor and is used as
   /// the initial value for `lastError` in an object of the [ErrNotifier]
